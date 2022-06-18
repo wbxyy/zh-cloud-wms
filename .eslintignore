@@ -4,7 +4,11 @@ build/*.js
 src/assets
 # 忽略public目录下文件的语法检查
 public
-# 忽略当前目录下为js的文件的语法检查
+# 忽略src下js文件的语法检查
 *.js
-# 忽略当前目录下为vue的文件的语法检查
+# 忽略src下vue从文件的语法检查
 *.vue
+#检查zh/cloud中的文件
+!**/zh/cloud/**/*.vue
+#检查api中的文件
+!**/api/**/*.js

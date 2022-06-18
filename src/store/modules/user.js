@@ -40,7 +40,9 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
-          let data = res.data
+          //! cloud后端需要拿res.data，但是axios响应拦截器已经解包了最初的res，此处的res理应为data本身
+          // let data = res.data
+          let data = res
           setToken(data.access_token)
           commit('SET_TOKEN', data.access_token)
           setExpiresIn(data.expires_in)
@@ -85,7 +87,7 @@ const user = {
         })
       })
     },
-    
+
     // 退出系统
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
