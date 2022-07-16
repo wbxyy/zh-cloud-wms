@@ -1,0 +1,92 @@
+::v-deep .el-table .el-table__cell .cell{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+::v-deep .el-button{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+::v-deep .el-table .el-table__body-wrapper{
+  // overflow-x:hidden !important;
+}
+
+::v-deep .el-dialog__body{
+  padding:0 12px;
+}
+
+::v-deep .el-card__body{
+  padding:0;
+}
+
+
+// 解决不同表单控件在el-form-item中高度不一样的问题。
+::v-deep .el-form-item--medium .el-form-item__content {
+  height: 36px;
+}
+::v-deep .el-form-item--small {
+  margin-bottom: 16px;
+  .el-form-item__content {
+    height: 33px;
+  }
+}
+::v-deep .el-form-item--mini {
+  margin-bottom: 12px;
+  .el-form-item__content{
+    height: 29px;
+  }
+}
+
+// el-table的cell中的el-form-item去除margin
+::v-deep .el-table{
+  .el-form-item--mini.el-form-item, .el-form-item--small.el-form-item {
+    margin-bottom: 0;
+    margin-right: 0;
+  }
+
+  .el-form-item {
+    margin-bottom: 0;
+    margin-right: 0;
+  }
+}
+
+//?解决el-table中fixed列用visibility隐藏元素，会被v-focus指令触发的问题
+//?例如将el-select放入el-table-cell中，会弹出2个el-popper
+// ::v-deep .el-table .el-table__cell.is-hidden > * {
+//     display: none;
+//     visibility: hidden;
+// }
+
+.little-margin-top{
+  margin-top:18px;
+}
+
+.card-container{
+  margin-top: 10px;
+}
+
+.card-form-padding{
+  padding:15px 10px 0px 20px;
+}
+.card-padding{
+  padding:10px 10px 10px 10px;
+}
+
+.card-title{
+  min-width:425px;
+  display: flex;
+  align-items:center;
+  justify-content: space-between;
+}
+
+
+.param-input{
+  width: 100%;
+}
+
+.param-btn{
+  max-width: 100%;
+}

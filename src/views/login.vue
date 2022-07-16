@@ -115,6 +115,8 @@ export default {
           this.codeUrl = 'data:image/gif;base64,' + res.img
           this.loginForm.uuid = res.uuid
         }
+      }).catch(err => {
+        console.log(err)
       })
     },
     getCookie() {
@@ -141,7 +143,9 @@ export default {
             Cookies.remove('rememberMe')
           }
           this.$store.dispatch('Login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' }).catch(() => {})
+            this.$router.push({ path: this.redirect || '/' }).catch(e => {
+              console.log(e)
+            })
           }).catch(() => {
             this.loading = false
             if (this.captchaOnOff) {
@@ -161,8 +165,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
-  background-size: cover;
+
 }
 .title {
   margin: 0px auto 30px auto;
@@ -171,8 +174,12 @@ export default {
 }
 
 .login-form {
+
+  input,button{
+    opacity:.8;
+  }
   border-radius: 6px;
-  background: #ffffff;
+  background: rgba(255,255,255,.5);
   width: 400px;
   padding: 25px 25px 5px 25px;
   .el-input {

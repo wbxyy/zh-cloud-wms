@@ -232,8 +232,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/styles/variables.scss";
 .tags-view-container {
-  height: 34px;
+  height: $tag-view-height;
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #d8dce5;

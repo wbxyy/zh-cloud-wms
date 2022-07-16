@@ -6,6 +6,9 @@ import errorCode from '@/utils/errorCode'
 import { tansParams, blobValidate } from '@/utils/ruoyi'
 import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
+import {routeMap} from '@/config/routeMapConfig'
+import _ from 'lodash'
+
 
 let downloadLoadingInstance
 // 是否显示重新登录
@@ -20,85 +23,23 @@ const service = axios.create({
   timeout: 10000
 })
 
-//? request拦截器（接通本地开发服务器的特制接口映射）
-service.interceptors.request.use(config=>{
-  const localDevURLMap = [{
-      raw:'/auth/login',
-      rewrite:'/login',
-      meta:'登录接口'
-    },
-    {
-      raw:'/auth/register',
-      rewrite:'/register',
-      meta:'注册接口'
-    },
-    {
-      raw:'/system/user/getInfo',
-      rewrite:'/getInfo',
-      meta:'获取用户信息接口'
-    },
-    {
-      raw:'/auth/logout',
-      rewrite:'/logout',
-      method:'post',
-      meta:'退出系统接口'
-    },
-    {
-      raw:/\/code$/,
-      rewrite:'/captchaImage',
-      meta:"获取验证码图片接口"
-    },
-    {
-      raw:'/system/menu/getRouters',
-      rewrite:'/getRouters',
-      meta:'获取菜单接口'
-    },
-    {
-      raw:'/schedule/job',
-      rewrite:'/monitor/job',
-      meta:'定时任务接口-(列表，单个，增加，更新，删除，改状态)'
-    },
-    {
-      raw:'/schedule/job',
-      rewrite:'/monitor/job',
-      meta:'定时任务接口'
-    },
-    {
-      raw:'/system/logininfor',
-      rewrite:'/monitor/logininfor',
-      meta:'登录日志'
-    },
-    {
-      raw:'/system/operlog',
-      rewrite:'/monitor/operlog',
-      meta:'操作日志'
-    },
-    {
-      raw:'/system/online',
-      rewrite:'/monitor/online',
-      meta:'在线用户'
-    },
-    {
-      raw:'/code/gen',
-      rewrite:'/tool/gen',
-      meta:'代码生成'
-    },
-
-  ]
-
-  localDevURLMap.forEach(item=>{
-    if(config.url.match(item.raw)){
-      config.url = config.url.replace(item.raw,item.rewrite)
-      config.method = item.method || config.method
-    }
+if(process.env.VUE_APP_ENV === 'my'){
+  //? request拦截器（接通本地开发服务器的特制接口映射）
+  service.interceptors.request.use(config=>{
+    routeMap.forEach(item=>{
+      config.url = config.url.indexOf('/')===0?config.url:`/${config.url}`
+      if(config.url.match(item.raw)){
+        config.url = config.url.replace(item.raw,item.rewrite)
+        config.method = item.method || config.method
+      }
+    })
+    return config
   })
+}
 
-  return config
-})
 
 // request拦截器
 service.interceptors.request.use(config => {
-  console.log(config.headers)
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
   // 是否需要防止数据重复提交
@@ -144,7 +85,6 @@ service.interceptors.request.use(config => {
 
 // 响应拦截器
 service.interceptors.response.use(res => {
-  console.log(res);
   // 未设置状态码则默认成功状态
   const code = res.data.code || 200
   // 获取错误信息
@@ -202,14 +142,6 @@ service.interceptors.response.use(res => {
   return Promise.reject(error)
 })
 
-//? 响应拦截器（为接通本地开发服务器，修改属性名）
-service.interceptors.response.use(res=>{
-  if(res.token){
-    res.access_token = res.token
-  }
-  return res
-})
-
 // 通用下载方法
 export function download(url, params, filename) {
   downloadLoadingInstance = Loading.service({ text: '正在下载数据，请稍候', spinner: 'el-icon-loading', background: 'rgba(0, 0, 0, 0.7)' })
@@ -218,8 +150,8 @@ export function download(url, params, filename) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     responseType: 'blob'
   }).then(async(data) => {
-    const isLogin = await blobValidate(data)
-    if (isLogin) {
+    const isBlob = await blobValidate(data)
+    if (isBlob) {
       const blob = new Blob([data])
       saveAs(blob, filename)
     } else {
@@ -235,5 +167,7 @@ export function download(url, params, filename) {
     downloadLoadingInstance.close()
   })
 }
+
+
 
 export default service

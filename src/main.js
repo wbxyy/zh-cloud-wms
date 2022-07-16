@@ -1,3 +1,7 @@
+//! 没配置好的东西
+// TODO css 的路径提示
+// TODO vue2 双引号补全
+
 import Vue from 'vue'
 
 import Cookies from 'js-cookie'
@@ -41,6 +45,10 @@ import DictData from '@/components/DictData'
 import AFTableColumn from 'af-table-column'
 // 全局方法挂载
 Vue.use(AFTableColumn)
+
+
+import VFColumn from 'v-fit-columns';
+Vue.use(VFColumn);
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
 Vue.prototype.parseTime = parseTime

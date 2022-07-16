@@ -8,7 +8,11 @@ public
 *.js
 # 忽略src下vue从文件的语法检查
 *.vue
+# 忽略 markdown'
+*.md
 #检查zh/cloud中的文件
 !**/zh/cloud/**/*.vue
 #检查api中的文件
 !**/api/**/*.js
+
+!**/views/*

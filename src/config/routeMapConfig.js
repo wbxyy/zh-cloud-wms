@@ -1,0 +1,93 @@
+//? 连接本地 dev 服务器需要进行的 url 重写
+const normalRoutes = [{
+  raw:'/auth/login',
+  rewrite:'/login',
+  meta:'登录接口'
+},
+{
+  raw:'/auth/register',
+  rewrite:'/register',
+  meta:'注册接口'
+},
+{
+  raw:'/system/user/getInfo',
+  rewrite:'/getInfo',
+  meta:'获取用户信息接口'
+},
+{
+  raw:'/auth/logout',
+  rewrite:'/logout',
+  method:'post',
+  meta:'退出系统接口'
+},
+{
+  raw:/\/code$/,
+  rewrite:'/captchaImage',
+  meta:"获取验证码图片接口"
+},
+{
+  raw:'/system/menu/getRouters',
+  rewrite:'/getRouters',
+  meta:'获取菜单接口'
+},
+{
+  raw:'/schedule/job',
+  rewrite:'/monitor/job',
+  meta:'定时任务接口-(列表，单个，增加，更新，删除，改状态)'
+},
+{
+  raw:'/schedule/job',
+  rewrite:'/monitor/job',
+  meta:'定时任务接口'
+},
+{
+  raw:'/system/logininfor',
+  rewrite:'/monitor/logininfor',
+  meta:'登录日志'
+},
+{
+  raw:'/system/operlog',
+  rewrite:'/monitor/operlog',
+  meta:'操作日志'
+},
+{
+  raw:'/system/online',
+  rewrite:'/monitor/online',
+  meta:'在线用户'
+},
+{
+  raw:'/code/gen',
+  rewrite:'/tool/gen',
+  meta:'代码生成'
+}]
+
+const storeInRoutes = [
+  {
+    raw:'/hwrc/list',
+    rewrite:'/mock_api/wms/store_in/list',
+    meta:'入仓单列表'
+  },
+  {
+    raw:'/zdspck/selectWarehouse1',
+    rewrite:'/mock_api/wms/store_in/warehouseList',
+    meta:'选择仓库'
+  },
+  {
+    raw:'/category/selectPosition',
+    rewrite:'/mock_api/wms/store_in/binsList',
+    meta:'选择仓位'
+  },
+  {
+    raw:'/shop/selectCustomer',
+    rewrite:'/mock_api/wms/store_in/customerList',
+    meta:'选择客户'
+  },
+  {
+    raw:'/category/detailsDropDown1',
+    rewrite:'/mock_api/wms/store_in/categoryDropdown',
+    meta:'类目下拉'
+  },
+]
+
+
+export const routeMap = normalRoutes.concat(storeInRoutes)

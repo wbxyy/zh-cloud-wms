@@ -7,7 +7,56 @@ import { blobValidate } from "@/utils/ruoyi";
 
 const baseURL = process.env.VUE_APP_BASE_API
 
+import {routeMap} from '@/config/routeMapConfig'
+if(process.env.VUE_APP_ENV === 'my'){
+  //? request拦截器（接通本地开发服务器的特制接口映射）
+  axios.interceptors.request.use(config=>{
+    routeMap.forEach(item=>{
+      config.url = config.url.indexOf('/')===0?config.url:`/${config.url}`
+      if(config.url.match(item.raw)){
+        config.url = config.url.replace(item.raw,item.rewrite)
+        config.method = item.method || config.method
+      }
+    })
+    return config
+  })
+}
+
 export default {
+  name(name, isDelete = true) {
+    var url = baseURL + "/common/download?fileName=" + encodeURI(name) + "&delete=" + isDelete
+    axios({
+      method: 'get',
+      url: url,
+      responseType: 'blob',
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    }).then(async (res) => {
+      const isBlob = await blobValidate(res.data);
+      if (isBlob) {
+        const blob = new Blob([res.data])
+        this.saveAs(blob, decodeURI(res.headers['download-filename']))
+      } else {
+        this.printErrMsg(res.data);
+      }
+    })
+  },
+  resource(resource) {
+    var url = baseURL + "/common/download/resource?resource=" + encodeURI(resource);
+    axios({
+      method: 'get',
+      url: url,
+      responseType: 'blob',
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    }).then(async (res) => {
+      const isBlob = await blobValidate(res.data);
+      if (isBlob) {
+        const blob = new Blob([res.data])
+        this.saveAs(blob, decodeURI(res.headers['download-filename']))
+      } else {
+        this.printErrMsg(res.data);
+      }
+    })
+  },
   zip(url, name) {
     var url = baseURL + url
     axios({
@@ -16,8 +65,8 @@ export default {
       responseType: 'blob',
       headers: { 'Authorization': 'Bearer ' + getToken() }
     }).then(async (res) => {
-      const isLogin = await blobValidate(res.data);
-      if (isLogin) {
+      const isBlob = await blobValidate(res.data);
+      if (isBlob) {
         const blob = new Blob([res.data], { type: 'application/zip' })
         this.saveAs(blob, name)
       } else {
@@ -35,4 +84,3 @@ export default {
     Message.error(errMsg);
   }
 }
-

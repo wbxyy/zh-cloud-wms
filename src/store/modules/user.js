@@ -39,16 +39,23 @@ const user = {
       const code = userInfo.code
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
-          //! cloud后端需要拿res.data，但是axios响应拦截器已经解包了最初的res，此处的res理应为data本身
-          // let data = res.data
-          let data = res
-          setToken(data.access_token)
-          commit('SET_TOKEN', data.access_token)
-          setExpiresIn(data.expires_in)
-          commit('SET_EXPIRES_IN', data.expires_in)
+        login(username, password, code, uuid).then(data => {
+          //? 此处的 data 已经被 response 拦截器解包过一次
+          let access_token,expires_in
+          if(process.env.VUE_APP_ENV === 'my'){
+            access_token = data.token
+          }else{
+            access_token =  data.data.access_token
+            expires_in = data.data.expires_in
+          }
+
+          setToken(access_token)
+          commit('SET_TOKEN', access_token)
+          setExpiresIn(expires_in)
+          commit('SET_EXPIRES_IN', expires_in)
           resolve()
         }).catch(error => {
+          console.log('登录失败');
           reject(error)
         })
       })

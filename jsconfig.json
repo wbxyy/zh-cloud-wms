@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "target": "es5",
+    "module": "esnext",
+    "baseUrl": "./",
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": ["src/*"],
+      "@view/*":["src/views/zh/cloud/shop/*"],
+      "@img/*":["src/assets/images/*"],
+      "@api/*":["src/api/zh/cloud/*"],
+      "@style/*":["src/assets/styles/*"]
+    },
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+  },
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*"]
+}

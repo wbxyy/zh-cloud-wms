@@ -19,6 +19,7 @@
         @change="dataChange"
       ></el-transfer>
     </el-dialog>
+
   </div>
 </template>
 <script>
@@ -78,9 +79,9 @@ export default {
 ::v-deep .el-transfer__button {
   border-radius: 50%;
   padding: 12px;
-  display: block;
   margin-left: 0px;
 }
+
 ::v-deep .el-transfer__button:first-child {
   margin-bottom: 10px;
 }

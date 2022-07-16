@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",
+    "my": "vue-cli-service serve --mode my",
     "build:prod": "vue-cli-service build",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
@@ -49,6 +50,8 @@
     "js-beautify": "1.13.0",
     "js-cookie": "3.0.1",
     "jsencrypt": "3.0.0-rc.1",
+    "lodash": "^4.17.21",
+    "nanoid": "^4.0.0",
     "nprogress": "0.2.0",
     "quill": "1.3.7",
     "screenfull": "5.0.2",

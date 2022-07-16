@@ -87,7 +87,41 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
-  }
+  },
+  {
+    path: '/wms/store_in',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@view/wms/store_in/index'),
+        name: 'StoreIn',
+        meta: { title: '货物入仓', activeMenu: '/wms/store_in/index' }
+      },
+      {
+        path: 'test',
+        component: () => import('@view/wms/store_in/test'),
+        name: 'storeInTest',
+        meta: { title: '货物入仓测试', activeMenu: '/wms/store_in/test' }
+      },
+      {
+        path: 'add',
+        name: 'StoreInAdd',
+        component: () => import('@view/wms/store_in/storeInAdd/index'),
+        meta: { title: '添加入仓',activeMenu:'/wms/store_in/StoreInAdd/index' }
+      },
+      {
+        path: 'edit',
+        name: 'StoreInEdit',
+        component: () => import('@view/wms/store_in/storeInEdit/index'),
+        meta: { title: '编辑入仓',activeMenu:'/wms/store_in/StoreInEdit/index' }
+      },
+    ]
+  },
+
+  //? 分析比写代码更重要
+  //? 先把路由写在静态，后续得到权限字符串后再写在动态
 ]
 
 // 动态路由，基于用户权限动态去加载
@@ -161,7 +195,8 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
-  }
+  },
+
 ]
 
 // 防止连续点击多次路由报错

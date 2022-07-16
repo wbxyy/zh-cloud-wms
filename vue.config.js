@@ -36,13 +36,21 @@ module.exports = {
     open: true,
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
+      '\.*/mock_api':{
+        target:'http://localhost:4000',
+        changeOrigin:true,
+        pathRewrite:{
+          "\.*/mock_api":''
+        }
+      },
       [process.env.VUE_APP_BASE_API]: {
-        target: `http://localhost:8080`,
+        target: process.env.VUE_APP_SERVER,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
-      }
+      },
+
     },
     disableHostCheck: true
   },
@@ -59,7 +67,9 @@ module.exports = {
       alias: {
         '@': resolve('src'),
         '@img':resolve('src/assets/images'),
-        '@view':resolve('src/views/zh/cloud')
+        '@view':resolve('src/views/zh/cloud/shop'),
+        '@api':resolve('src/api/zh/cloud'),
+        '@style':resolve('src/assets/styles')
       }
     },
     plugins: [
@@ -75,6 +85,11 @@ module.exports = {
   chainWebpack(config) {
     config.plugins.delete('preload') // TODO: need test
     config.plugins.delete('prefetch') // TODO: need test
+    //调试js
+    config
+    .when(process.env.NODE_ENV === 'development',
+      config => config.devtool('source-map')
+    );
 
     // set svg-sprite-loader
     config.module
