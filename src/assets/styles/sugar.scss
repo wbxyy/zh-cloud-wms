@@ -1,29 +1,34 @@
+//el-table单元格文本单行显示，文本超过长度时省略
 ::v-deep .el-table .el-table__cell .cell{
   overflow:hidden !important;
   text-overflow:ellipsis !important;
   white-space:nowrap !important;
 }
 
+//el-button内文本单行显示，文本超出长度时省略
 ::v-deep .el-button{
   overflow:hidden !important;
   text-overflow:ellipsis !important;
   white-space:nowrap !important;
 }
 
+//隐藏el-table的横向滚动条
 ::v-deep .el-table .el-table__body-wrapper{
   // overflow-x:hidden !important;
 }
 
+//去除对话框上下内边距
 ::v-deep .el-dialog__body{
   padding:0 12px;
 }
 
+//去除卡片所有内边距
 ::v-deep .el-card__body{
   padding:0;
 }
 
 
-// 解决不同表单控件在el-form-item中高度不一样的问题。
+// 固定不同size下的el-form-item高度，解决不同表单控件在el-form-item中高度不一样的问题。
 ::v-deep .el-form-item--medium .el-form-item__content {
   height: 36px;
 }
@@ -40,7 +45,7 @@
   }
 }
 
-// el-table的cell中的el-form-item去除margin
+// 去除el-table单元格中的el-form-item的外边距
 ::v-deep .el-table{
   .el-form-item--mini.el-form-item, .el-form-item--small.el-form-item {
     margin-bottom: 0;
@@ -55,17 +60,19 @@
 
 //?解决el-table中fixed列用visibility隐藏元素，会被v-focus指令触发的问题
 //?例如将el-select放入el-table-cell中，会弹出2个el-popper
+//!此样式无法解决问题
 // ::v-deep .el-table .el-table__cell.is-hidden > * {
 //     display: none;
 //     visibility: hidden;
 // }
 
+
 .little-margin-top{
   margin-top:18px;
 }
 
-.card-container{
-  margin-top: 10px;
+.tinny-margin-top{
+  margin-top:10px;
 }
 
 .card-form-padding{
@@ -89,4 +96,28 @@
 
 .param-btn{
   max-width: 100%;
+}
+
+
+.error{
+  font-weight: 700;
+  color: red;
+  position:relative;
+  &::before{
+    z-index:9999;
+    content:'bug';
+    color: #fff;
+    font-size: 12px;
+    line-height: 12px;
+    position:absolute;
+    padding: 12px;
+    background-color: rgba(255,0,0);
+    transform: rotate(45deg);
+  }
+  &:hover::before{
+    background-color: transparent;
+    color: transparent;
+  }
+
+
 }

@@ -10,9 +10,9 @@ public
 *.vue
 # 忽略 markdown'
 *.md
-#检查zh/cloud中的文件
+#检查zh/cloud
 !**/zh/cloud/**/*.vue
-#检查api中的文件
+#检查api
 !**/api/**/*.js
-
+#检查视图组件
 !**/views/*

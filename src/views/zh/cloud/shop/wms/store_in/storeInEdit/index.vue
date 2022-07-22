@@ -24,18 +24,21 @@
       :form-data="formData"
       :form-col="formCol"
     >
-      <div class="fr filter-item">
+      <!-- <div class="fr filter-item">
         <el-button @click="handleReset">还原</el-button>
-      </div>
+      </div> -->
     </SugarForm>
     <SugarEditTable
       ref="SugarEditTable"
       :table-data="list"
       :table-columns="tableColumns"
+      :edit-mode="false"
+      :allow-empty="true"
     />
 
     <el-button type="primary" @click="handleSubmit">提交更新</el-button>
 
+    <el-button type="primary" @click="handleAudit">{{ verify }}</el-button>
   </div>
 </template>
 
@@ -75,11 +78,9 @@
 // 颜色 wpggH <==> color（✔）
 
 import { formLabel, tableColumns } from './data'
-import { updateStoreIn, updateStoreInDetail, storeIn } from '@/api/zh/cloud/wms/store_in'
+import { storeInUpdate, storeInUpdateDetail, storeIn, storeInAudit, storeInReject, storeInDelete } from '@api/wms/store_in'
 import SugarForm from '@/components/SugarForm'
 import SugarEditTable from '@/components/SugarEditTable'
-import _ from 'lodash'
-const row = null
 const formData = {
   billRemark: null, //! 单证备注
   $billNo: null, // 单号
@@ -102,6 +103,7 @@ const formData = {
 //   splitNumber: null,
 //   splitWeight: null
 // }
+
 export default {
   name: 'StoreInEdit',
   components: {
@@ -116,13 +118,17 @@ export default {
       loading: true,
       // 明细
       list: [],
+      rawList: [],
       formData: Object.assign({}, formData),
       formLabel: formLabel,
-      tableColumns: tableColumns
+      tableColumns: tableColumns,
+      verify: ''
     }
   },
   computed: {
-
+    row() {
+      return this.$route.params.row
+    }
   },
   watch: {
     // 'formData.warehouse'(value) {
@@ -147,46 +153,71 @@ export default {
     //   }
     // }
   },
+  activated() {
+    this.getData()
+  },
   mounted() {
-    // 回显数据
-    if (this.$route.params.row) {
-      Object.keys(this.formData).forEach(key => {
-        this.formData[key] = this.$route.params.row[key]
-      })
-    }
 
-    if (this.formData.$billId) {
-      storeIn(this.formData.$billId).then(res => {
-        // 传回来的data是散装数据，此处要构造仓库下拉和仓位下拉的初始选项
-        res.data.forEach(item => {
-          // 需要构造的选项(看菜吃饭，需要后端配合传id和label)
-          // $newWarehouseId
-          // $newPositionId
-          item.$newWarehouseId = {
-            label: item.warehouse,
-            value: item.$warehouseId
-          }
-
-          item.$newPositionId = {
-            label: item.position,
-            value: Number(item.$positionId)
-          }
-        })
-        this.list = res.data
-      })
-    }
   },
 
   methods: {
+    getData() {
+      // 回显数据
+      // 守卫
+      if (!this.row) return
+
+      this.verify = this.row.verify === '未审核' ? '审核' : '驳回'
+      Object.keys(this.formData).forEach(key => {
+        this.formData[key] = this.row[key]
+      })
+
+      if (this.formData.$billId) {
+        storeIn(this.formData.$billId).then(res => {
+        // 传回来的data是散装数据，此处要构造仓库下拉和仓位下拉的初始选项
+          res.data.forEach(item => {
+          // 需要构造的选项(看菜吃饭，需要后端配合传id和label)
+          // $newWarehouseId
+          // $newPositionId
+            item.$newWarehouseId = {
+              label: item.warehouse,
+              value: item.$warehouseId
+            }
+
+            item.$newPositionId = {
+              label: item.position,
+              value: Number(item.$positionId)
+            }
+          })
+          this.list = res.data
+          // rowList用来保持原始数据，浅拷贝
+          this.rawList = this.list.slice()
+        })
+      }
+    },
     handleSubmit() {
       Promise.all([this.$refs.SugarForm.validate(), this.$refs.SugarEditTable.validate()]).then(values => {
         if (values.every(truly => truly)) {
-          const promises = []
+          // 获取updateList和deleteList
+          const promisesUpdate = []
           this.list.forEach(item => {
-            console.log(item)
-            promises.push(updateStoreInDetail(Object.assign(item, { $billId: this.formData.$billId })))
+            // 我服了这接口，发过来的是Number类型，发回去要String类型
+            // item.$skuId = Number(item.$skuId)//诶，修好了
+
+            promisesUpdate.push(storeInUpdateDetail(Object.assign(item, {
+              $billId: Number(this.formData.$billId)
+            })))
           })
-          return Promise.all([updateStoreIn(this.formData), ...promises])
+
+          const promisesDelete = []
+          const delList = this.rawList.filter(f => !this.list.find(i => i.$skuId === f.$skuId))
+
+          delList.forEach(item => {
+            promisesDelete.push(storeInDelete(Object.assign(item, {
+              $billId: Number(this.formData.$billId),
+              createDate: this.row.createDate
+            })))
+          })
+          return Promise.all([storeInUpdate(this.formData), ...promisesUpdate, ...promisesDelete])
         }
       }).then(res => {
         if (!res) return this.$modal.alert('修改入仓单失败，联系....')
@@ -208,6 +239,37 @@ export default {
     },
     handleReset() {
       this.formData = Object.assign({}, formData)
+    },
+    handleAudit() {
+      const data = [this.row]
+      if (this.verify === '审核') {
+        storeInAudit(data).then(res => {
+          this.$modal.msgSuccess('审核成功')
+          this.verify = '驳回'
+          this.$router.replace({
+            name: 'StoreIn',
+            params: {
+              refresh: true
+            }
+          })
+        }).catch(err => {
+          this.$modal.msgError('审核失败', err)
+        })
+      } else {
+        const id = this.row.$billId
+        storeInReject(id).then(res => {
+          this.$modal.msgSuccess('驳回成功')
+          this.verify = '审核'
+          this.$router.replace({
+            name: 'StoreIn',
+            params: {
+              refresh: true
+            }
+          })
+        }).catch(err => {
+          this.$modal.msgError('驳回失败', err)
+        })
+      }
     }
   }
 }

@@ -7,7 +7,7 @@
       <el-row class="card-form-padding">
         <el-col v-for="(item,i) in formLabel.filter(group=>group.renderGroup===renderGroup)" :key="i" :span="4" :xl="8" :lg="12" :md="24" :sm="24" :xs="24">
           <el-form-item :label="item.label" :label-width="item.labelWidth" :prop="item.key" >
-            <SugarInput :form-item="item" v-bind:value="formData[item.key]"  v-on:update:value="updateSugar(item,formData,$event)"></SugarInput>
+            <SugarTypeIn :form-item="item" v-bind:value="formData[item.key]"  v-on:update:value="updateSugar(item,formData,$event)"></SugarTypeIn>
           </el-form-item>
         </el-col>
       </el-row>
@@ -16,11 +16,11 @@
 </template>
 
 <script>
-import SugarInput from '@/components/SugarInput'
+import SugarTypeIn from '@/components/SugarTypeIn'
 export default {
   name:'SugarFieldsetCard',
   components:{
-    SugarInput
+    SugarTypeIn
   },
   props:['formLabel','formData'],
   computed:{

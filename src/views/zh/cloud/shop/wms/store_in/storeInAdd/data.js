@@ -35,9 +35,10 @@ export const formLabel = [
     key: 'plateNumber',//!dzzy6
     label: '车牌',
     inputType:0,
-    // rule:{
-    //   required: true, message: '车牌不能为空', trigger: 'blur'
-    // }
+    rule:[
+      { required: true, message: '车牌不能为空', trigger: 'blur' },
+      // { pattern:/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领][A-HJ-NP-Z][A-HJ-NP-Z0-9]{4,5}[A-HJ-NP-Z0-9挂学警港澳]$/, message: '请输入正确的车牌号', trigger: 'blur' },
+    ]
   },
   {
     key: 'linkman',//!dzzy7
@@ -52,7 +53,7 @@ export const formLabel = [
     label: '电话',
     inputType:0,
     // rule:{
-    //   required: true, message: '电话不能为空', trigger: 'blur'
+    //   pattern:/^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/, message: '请输入正确的手机号', trigger: 'blur'
     // }
   },
   {
@@ -60,7 +61,7 @@ export const formLabel = [
     label: '身份证',
     inputType:0,
     // rule:{
-    //   required: true, message: '身份证不能为空', trigger: 'blur'
+    //   pattern:/^\d{6}((((((19|20)\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|(((19|20)\d{2})(0[13578]|1[02])31)|((19|20)\d{2})02(0[1-9]|1\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\d{3})|((((\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|((\d{2})(0[13578]|1[02])31)|((\d{2})02(0[1-9]|1\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\d{2}))(\d|X|x)$/, message: '请输入正确的身份证', trigger: 'blur'
     // }
   },
   {
@@ -101,6 +102,11 @@ export const tableColumns = [
     inputType: 2,
     valueFormat:'yyyy-MM-dd',
     renderGroup: '基本货物信息',
+    columnOrder:99,
+    labelOrder:1000,
+    // labelVisible:false,
+    // columnVisible:false,
+    error:true,
     rule:{
       required: true, message: '入仓日期不能为空', trigger: 'change'
     },
@@ -112,9 +118,11 @@ export const tableColumns = [
     fixed: false,
     width: '200px',
     inputType: 0,
+    columnOrder:93,
+    labelOrder:990,
     renderGroup: '基本货物信息',
     rule:{
-      required: true, message: '物品规格可以为空', trigger: 'blur'
+      required: true, message: '物品规格不能为空', trigger: 'blur'
     }
   },
 
@@ -124,6 +132,8 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     inputType: 0,
+    columnOrder:95,
+    labelOrder:950,
     renderGroup: '基本货物信息',
     rule:{
       required: true, message: '批号不能为空', trigger: 'blur'
@@ -135,9 +145,11 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     inputType: 0,
+    columnOrder:94,
+    labelOrder:940,
     renderGroup: '基本货物信息',
     // rule:{
-    //   required: true, message: '柜号可以为空', trigger: 'blur'
+    //   required: true, message: '柜号不能为空', trigger: 'blur'
     // }
   },
    {
@@ -149,10 +161,13 @@ export const tableColumns = [
     // filter(val){
     //   return Math.round(Number(val || 0) * 100) / 100
     // },
+    columnOrder:98,
+    labelOrder:980,
     renderGroup: '基本货物信息',
-    rule:{
-      required: true, message: '件数不能为空', trigger: 'blur'
-    },
+    rule:[
+      {required: true, message: '件数不能为空', trigger: 'blur'},
+      { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字', trigger: 'blur' }
+    ]
   },
   {
     key: 'pieceWeight',//!spjsl
@@ -162,21 +177,26 @@ export const tableColumns = [
     width: '180px',
     inputType: 0,
     unit:'kg',
+    columnOrder:96,
+    labelOrder:970,
     // filter(val){
     //   if(!Number(val)) return
     //   return Math.round(val * 100) / 100
     // },
     renderGroup: '基本货物信息',
-    rule:{
-      required: true, message: '单重不能为空', trigger: 'blur'
-    },
+    rule:[
+      { required: true, message: '单重不能为空', trigger: 'blur'},
+      { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字', trigger: 'blur' }
+    ]
   },
   {
-    key: 'position',//spcwid
+    key: '$positionId',//spcwid
     label: '仓位',
     align: 'left',
     fixed: false,
     inputType: 1,
+    columnOrder:92,
+    labelOrder:930,
     renderGroup: '基本货物信息',
     options: [],
     rule:{
@@ -191,12 +211,14 @@ export const tableColumns = [
     width: '180px',
     inputType: 0,
     disabled:true,
+    columnOrder:97,
+    labelOrder:960,
     computed(formData){
-       const val = Number(formData.pieceWeight || 0) * Number(formData.number || 0) / 1000
-      return val.toFixed(4)
+      const val = Number(formData.pieceWeight || 0) * Number(formData.number || 0) / 1000
+      return Object.is(val,NaN) ? 0 : val.toFixed(4)
     },
     unit:'吨',
-    labelWidth:'200px',
+    // labelWidth:'200px',
     renderGroup: '基本货物信息',
     // rule:{
     //   required: true, message: '重量是自动计算的，不用填', trigger: 'blur'
@@ -208,6 +230,8 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     inputType: 0,
+    columnOrder:91,
+    labelOrder:920,
     renderGroup: '基本货物信息',
     // rule:{
     //   required: true, message: '品牌不能为空', trigger: 'blur'
@@ -220,6 +244,7 @@ export const tableColumns = [
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
+    columnVisible:false,
     options:getYarn()
     // rule:{
     //   required: true, message: '入仓日期不能为空', trigger: 'blur'
@@ -232,6 +257,7 @@ export const tableColumns = [
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
+    columnVisible:false,
     options:getTech()
   },
   {
@@ -241,6 +267,7 @@ export const tableColumns = [
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
+    columnVisible:false,
     options:getProcess()
   },
   {
@@ -250,6 +277,7 @@ export const tableColumns = [
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
+    columnVisible:false,
     options:getPurpose()
   },
   {
@@ -259,15 +287,17 @@ export const tableColumns = [
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
+    columnVisible:false,
     options:getOrigin()
   },
   {
     key: 'bleach',//wpggF
-    label: '漂白性',
+    label: '漂染性',
     align: 'left',
     fixed: false,
     inputType: 0,
     renderGroup: '高级货物信息',
+    columnVisible:false,
     options:getBleach()
     // rule:{
     //   required: true, message: '漂白性不能为空', trigger: 'blur'
@@ -279,6 +309,8 @@ export const tableColumns = [
     align: 'center',
     fixed: false,
     inputType: 2,
+    valueFormat:'yyyy-MM-dd',
+    columnVisible:false,
     renderGroup: '高级货物信息',
     // rule:{
     //   required: true, message: '生产日期不能为空', trigger: 'change'
@@ -290,6 +322,7 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     inputType: 0,
+    columnVisible:false,
     renderGroup: '高级货物信息',
     // rule:{
     //   required: true, message: '颜色不能为空', trigger: 'blur'

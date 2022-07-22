@@ -300,78 +300,71 @@
           </el-row>
 
           <el-row>
-            <el-col :span="6">
-              <el-popover trigger="click" content="气泡" disabled>
-                <span>利用分发取代content信息</span>
-                <el-button slot="reference">点击气泡</el-button>
-              </el-popover>
+            <el-col :span="10" :xl="2" :lg="3" :md="4" :sm="5" :xs="6">
+              <el-form-item>
+                <el-popover trigger="click" content="气泡" disabled>
+                  <span>利用分发取代content信息</span>
+                  <el-button slot="reference">点击气泡</el-button>
+                </el-popover>
+              </el-form-item>
             </el-col>
-            <el-col :span="6">
-              <el-popover trigger="hover" content="气泡">
-                <span>利用分发取代content信息</span>
-                <span>利用分发取代content信息</span>
-                <el-button slot="reference">悬停气泡</el-button>
-              </el-popover>
+            <el-col :span="10" :xl="2" :lg="3" :md="4" :sm="5" :xs="6">
+              <el-form-item>
+                <el-popover trigger="hover" content="气泡">
+                  <span>利用分发取代content信息</span>
+                  <span>利用分发取代content信息</span>
+                  <el-button slot="reference">悬停气泡</el-button>
+                </el-popover>
+              </el-form-item>
             </el-col>
-            <el-col :span="6">
-              <el-popover trigger="focus" content="气泡">
-                <span>利用分发取代content信息</span>
-                <el-button slot="reference">焦点气泡</el-button>
-              </el-popover>
+            <el-col :span="10" :xl="2" :lg="3" :md="4" :sm="5" :xs="6">
+              <el-form-item>
+                <el-popover trigger="focus" content="气泡">
+                  <span>利用分发取代content信息</span>
+                  <el-button slot="reference">焦点气泡</el-button>
+                </el-popover>
+              </el-form-item>
             </el-col>
-            <el-col :span="6">
-              <el-popover v-model="popoverShow" trigger="manual" content="气泡">
-                <span>利用分发取代content信息</span>
-                <el-button slot="reference" @click="popoverShow=!popoverShow">手动激活</el-button>
-              </el-popover>
-            </el-col>
-            <el-col :span="6">
-              {{ Boolean(err.sugar) }}
-              {{ err.sugar }}
-              <el-popover :value="Boolean(err.sugar)" trigger="manual" content="气泡">
-                <el-button slot="reference" @click="$set(err,'sugar','不会')">手动激活</el-button>
-              </el-popover>
-              <span>{{ err['sugar'] }}</span>
+            <el-col :span="10" :xl="2" :lg="3" :md="4" :sm="5" :xs="6">
+              <el-form-item>
+                <el-popover :value="Boolean(popoverShow)" trigger="manual" content="气泡">
+                  <span>利用分发取代content信息</span>
+                  <el-button slot="reference" @click="popoverShow=!popoverShow">手动激活</el-button>
+                </el-popover>
+              </el-form-item>
             </el-col>
 
           </el-row>
 
           <el-row>
-            <el-col :span="10">
-              <el-form-item label="单行文本" prop="field120">
-                <el-input v-model="formData.field120" type="hidden" placeholder="请输入单行文本" clearable :style="{width: '100%'}" />
+            <!-- <el-col :span="10" :xl="4" :lg="6" :md="8" :sm="10" :xs="12">
+              <el-form-item label="选择省">
+                <el-select v-model="province" style="width:120px">
+                  <el-option v-for="item in provinceOpt" :key="item.dictValue" :label="item.dictLabel" :value="item.dictValue" />
+                </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="10">
-              <el-form-item label="单行文本" prop="field121">
-                <el-input v-model="formData.field121" placeholder="请输入单行文本" clearable :style="{width: '100%'}" />
+            <el-col :span="10" :xl="4" :lg="6" :md="8" :sm="10" :xs="12">
+              <el-form-item label="选择市">
+                <el-select v-model="city" style="width:120px">
+                  <el-option v-for="item in filterCity" :key="item.dictValue" :label="item.dictLabel" :value="item.dictValue" />
+                </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="10">
-              <el-form-item label="密码" prop="field122">
-                <el-input
-                  v-model="formData.field122"
-                  placeholder="请输入密码"
-                  clearable
-                  show-password
-                  :style="{width: '100%'}"
-                />
+            <el-col :span="10" :xl="4" :lg="6" :md="8" :sm="10" :xs="12">
+              <el-form-item label="选择区">
+                <el-select v-model="area" style="width:120px">
+                  <el-option v-for="item in filterArea" :key="item.dictValue" :label="item.dictLabel" :value="item.dictValue" />
+                </el-select>
               </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item size="large">
-                <el-button type="primary" @click="submitForm">提交</el-button>
-                <el-button @click="resetForm">重置</el-button>
+            </el-col> -->
+            <!-- <el-col :span="10" :xl="4" :lg="6" :md="8" :sm="10" :xs="12">
+              <el-form-item label="选择街道">
+                <el-select v-model="street" style="width:120px">
+                  <el-option v-for="item in streetOpt" :key="item.dictValue" :label="item.dictLabel" :value="item.dictValue" />
+                </el-select>
               </el-form-item>
-            </el-col>
-          </el-row>
-
-          <el-row>
-            <el-col>
-              <el-select v-model="student" value-key="id">
-                <el-option v-for="(item,index) in students" :key="item.id" :label="item.name" :value="item" />
-              </el-select>
-            </el-col>
+            </el-col> -->
           </el-row>
 
         </el-form>
@@ -383,13 +376,18 @@
 <script>
 // 来首页玩一下mappingField
 import { categoryDropdown } from '@api/wms/category'
-categoryDropdown().then(res => {
-  console.log(res)
-})
 export default {
   name: 'Index',
   data() {
     return {
+      provinceOpt: [],
+      cityOpt: [],
+      areaOpt: [],
+      streetOpt: [],
+      province: '',
+      city: '',
+      area: '',
+      street: '',
       student: {},
       students: [
         {
@@ -506,6 +504,61 @@ export default {
         }]
       }
     }
+  },
+  computed: {
+    filterCity() {
+      // 依赖province(当前选择的省，下一个省)
+      // 下一个省
+      const start = this.provinceOpt.find(f => f.dictValue === this.province)
+
+      const next = this.provinceOpt.find(f => f.dictValue === this.province + 1)
+      console.log(start.dictValue, next.dictValue)
+      // console.log(next)
+      // 判空
+      // let end = 0
+      // if (next) {
+      //   end = next.dictValue
+      // } else {
+      //   end = Number.MAX_VALUE
+      // }
+      // console.log(end)
+      // return this.cityOpt.filter(f => f.dictValue > Number(this.province) && Number(f.dictValue) < Number(end))
+      return 0
+    },
+    filterArea() {
+      // 依赖city
+      const index = this.cityOpt.findIndex(f => f.dictValue === this.city)
+      console.log(index)
+      const next = this.cityOpt[index + 1]
+      // 判空
+      let end = 0
+      if (next) {
+        end = next.dictValue
+      } else {
+        end = Number.MAX_VALUE
+      }
+      return this.areaOpt.filter(f => f.dictValue > Number(this.city) && Number(f.dictValue) < Number(end))
+    }
+    // filterStreet() {
+    //   // 依赖area
+    // }
+  },
+  created() {
+    this.getDicts('zh_province').then(res => {
+      // console.log(res.data)
+      this.provinceOpt = res.data
+    })
+    this.getDicts('zh_city').then(res => {
+      // console.log(res.data)
+      this.cityOpt = res.data
+    })
+    this.getDicts('zh_area').then(res => {
+      // console.log(res.data)
+      this.areaOpt = res.data
+    })
+    this.getDicts('zh_street').then(res => {
+      this.streetOpt = res.data
+    })
   },
   methods: {
     goTarget(href) {

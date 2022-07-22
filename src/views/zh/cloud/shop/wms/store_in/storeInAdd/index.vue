@@ -64,6 +64,7 @@
       </div>
     </SugarForm>
     <SugarEditTable
+      v-show="formData.warehouse"
       ref="SugarEditTable"
       :table-data="list"
       :table-columns="tableColumns"
@@ -76,7 +77,7 @@
 
 <script>
 import { formLabel, tableColumns } from './data'
-import { customerList, warehouseList, createStoreIn, warehousePositions } from '@/api/zh/cloud/wms/store_in'
+import { customerList, warehouseList, storeInCreate, warehousePositions } from '@/api/zh/cloud/wms/store_in'
 import SugarForm from '@/components/SugarForm'
 import SugarEditTable from '@/components/SugarEditTable'
 import _ from 'lodash'
@@ -150,13 +151,13 @@ export default {
       if (!warehouseId) return
       // 所有明细仓位重置
       this.list.forEach(item => {
-        item.position = null
+        item.$positionId = null
       })
       warehousePositions(warehouseId).then(res => {
         const data = res.data
         // 构造options
 
-        this.tableColumns.find(item => item.key === 'position').options = data.map(item => ({ label: item.position, value: item.$positionId }))
+        this.tableColumns.find(item => item.key === '$positionId').options = data.map(item => ({ label: item.position, value: item.$positionId }))
       })
     }
   },
@@ -180,8 +181,7 @@ export default {
       Promise.all([this.$refs.SugarForm.validate(), this.$refs.SugarEditTable.validate()]).then(values => {
         if (values.every(truly => truly)) {
           this.formData.list = this.list
-          console.log('提交前的数据', this.formData)
-          return createStoreIn(_.cloneDeep(this.formData))
+          return storeInCreate(this.formData)
         }
       }).then(res => {
         if (!res) return this.$modal.alert('添加入仓单失败，联系....')

@@ -28,8 +28,6 @@ export default {
   min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
-  // 影响我的sticky
-  // overflow: hidden;
 }
 
 .fixed-header+.app-main {

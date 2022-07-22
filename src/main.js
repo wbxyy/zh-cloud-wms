@@ -42,13 +42,9 @@ import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
 
-import AFTableColumn from 'af-table-column'
-// 全局方法挂载
-Vue.use(AFTableColumn)
 
 
-import VFColumn from 'v-fit-columns';
-Vue.use(VFColumn);
+
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
 Vue.prototype.parseTime = parseTime
@@ -87,6 +83,21 @@ Vue.use(Element, {
 })
 
 Vue.config.productionTip = false
+Vue.config.devtools = true
+Vue.config.performance = true
+
+// Vue.config.warnHandler = function (msg, vm, trace) {
+//   console.log(`haha,一个警告：${msg}`);
+//   // `trace` 是组件的继承关系追踪
+// }
+
+// Vue.config.errorHandler = function (err, vm, info) {
+//   // handle error
+//   // `info` 是 Vue 特定的错误信息，比如错误所在的生命周期钩子
+//   // 只在 2.2.0+ 可用
+//   console.log(`haha,一个错误：${info}`);
+
+// }
 
 new Vue({
   el: '#app',

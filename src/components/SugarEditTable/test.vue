@@ -56,7 +56,7 @@
               <el-popover  placement="top-start" trigger="manual" :value="Boolean(err[item.key])" ref="popover" >
                 <div slot="reference">
                   <el-form-item :prop="item.key" >
-                    <SugarInput :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index][item.key]" @update:value="tableData[scope.$index][item.key] = $event"></SugarInput>
+                    <SugarTypeIn :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index][item.key]" @update:value="tableData[scope.$index][item.key] = $event"></SugarTypeIn>
                   </el-form-Item>
                 </div>
                 <span>{{err[item.key]}}</span>
@@ -81,7 +81,7 @@
 
 <script>
 import SugarFieldsetCard from '@/components/SugarFieldsetCard'
-import SugarInput from '@/components/SugarInput'
+import SugarTypeIn from '@/components/SugarTypeIn'
 import SugarTestForm from '@/components/SugarForm/test.vue'
 import SugarForm from '@/components/SugarForm'
 import SugarEditCell from '@/components/SugarEditCell'
@@ -92,7 +92,7 @@ export default {
   name:'sugarEditTable',
   components:{
     SugarFieldsetCard,
-    SugarInput,
+    SugarTypeIn,
     SugarTestForm,
     SugarForm,
     SugarEditCell

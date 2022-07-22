@@ -5,29 +5,33 @@
 
 ### 初版的 SugarToolTip，是作为父组件的根元素，通过绝对定位来显示。
 
-缺点是需要获取父元素的左上角坐标，即 getBoundingClientRect().top 和 getBoundingClientRect().left
-然后在父元素中的某个子孙元素中产生点击事件 clickEvent，获取鼠标点击后的 pageX 和 pageY
-最后再获取页面滚动距离 window.scrollX 和 window.scrollY
+缺点：计算复杂，父组件中需要做不必要的计算
+
+获取父元素的左上角坐标，getBoundingClientRect().top 和 getBoundingClientRect().left
+
+在父元素中产生 clickEvent，鼠标点击位置 pageX 和 pageY
+
+再获取页面滚动距离 window.scrollX 和 window.scrollY
 
 计算 pageX - left - scrollX 取得 SugarToolTip 需要显示的 left，同理取得 top
 
-这种做法可以实现鼠标点击处产生toolTip的效果，但是计算比较复杂，且需要在父组件中计算后传入 SugarToolTip，使用起来不方便，无法作为一个合格的全局组件
+这样可以实现鼠标点击处产生toolTip的，但是需要在父组件中计算后传入 SugarToolTip，使用起来不方便，无法作为一个合格的组件
 
-### 新版 SugarToolTip 采用固定定位，通过在window上绑定点击事件决定显示位置；通过父组件调用show方法来控制显示;
+### 新版 SugarToolTip 采用固定定位，在window上绑定 clickEvent 决定显示位置，父组件调用 show() 控制显示;
 
-思路就是位置和显示逻辑分开，由 SugarToolTip 自己决定位置，由父组件控制显示
+由 SugarToolTip 决定位置，由父组件控制显示。
 
-固定定位配合window上的点击事件，只需要得到 clickEvent 的 clientX 和 clientY 就能定位 SugarToolTip
+position:fixed 配合window上的点击事件，得到鼠标 clientX 和 clientY 就能定位 SugarToolTip
 
-window上绑定点击事件，会让toolTip在任何位置上显示。其实我们只想通过父组件的子孙元素触发显示，并将显示范围限制在子孙元素内。
+window上绑定点击事件，会让toolTip在任何位置上显示。但我们只想通过父组件触发显示，并限制显示范围。
 
-*思路* SugarToolTip 出现在页面时，此时 show 为 true，并且自身有 left 和 top
+*思路* SugarToolTip 出现时， show 为 true，自身有 left 和 top
 
 show 是由子孙元素触发，仅传入显示内容。
 
-何时触发closeToolTip，只能由父组件控制
+closeToolTip() 由父组件控制
 
-在父组件中绑定点击，如果点击到子孙元素以外，则closeToolTip，这是一种方案
+父组件中绑定 clickEvent，如果点击到子孙元素以外，则 closeToolTip()，这是一种方案(bushi)
 
 能不能在showToolTip的时候就判断是否show？不行，showToolTip只由子孙元素触发，点击其他兄弟元素是无法处理已经显示成功的toolTip的。
 

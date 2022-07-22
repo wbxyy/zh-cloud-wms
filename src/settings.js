@@ -5,7 +5,7 @@ module.exports = {
   sideTheme: 'theme-dark',
 
   /**
-   * 是否系统布局配置
+   * 是否显示系统布局配置
    */
   showSettings: false,
 

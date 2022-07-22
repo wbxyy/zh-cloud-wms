@@ -11,8 +11,8 @@
           <el-row  v-if="index%formCol===0" :key="index">
             <el-col v-for="item in formLabel.filter((item,i)=>item.renderGroup===group && i>=index && i<index+Number(formCol))" :key="item.key" :xl="xl" :lg="lg" :md="md" :sm="sm" :xs="xs">
               <el-form-item :label="item.label" :label-width="item.labelWidth" :prop="item.key" >
-                <!-- <SugarInput :form-item="item" v-bind:value="formData[item.key]"  v-on:update:value="updateSugar(item,formData,$event)"></SugarInput> -->
-                <SugarInput :form-item="item" :value="formData[item.key]" @update:value="formData[item.key] = $event" :method-obj="methodObj"></SugarInput>
+                <!-- <SugarTypeIn :form-item="item" v-bind:value="formData[item.key]"  v-on:update:value="updateSugar(item,formData,$event)"></SugarTypeIn> -->
+                <SugarTypeIn :form-item="item" :value="formData[item.key]" @update:value="formData[item.key] = $event" :method-obj="methodObj"></SugarTypeIn>
               </el-form-item>
             </el-col>
           </el-row>
@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import SugarInput from '@/components/SugarInput'
+import SugarTypeIn from '@/components/SugarTypeIn'
 export default {
   name:'SugarFieldsetCard',
   components:{
-    SugarInput
+    SugarTypeIn
   },
   props:['formLabel','formData',"formCol",'methodObj'],
   computed:{

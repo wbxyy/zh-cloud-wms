@@ -1,49 +1,55 @@
 import service from '@/utils/request'
-import _ from 'lodash'
-import { resMapping, reqMapping, transformData, transformSelect } from '@/utils/sugar'
-import { schemaStoreInList,
-  schemaDelStoreIn,
-  schemaStoreIn,
-  schemaUpdateStoreIn,
-  schemaUpdateStoreInDetail,
-  schemaWarehousePositions,
-  schemaCreateStoreIn,
-  schemaWarehouseList,
-  schemaCustomerList } from './schema'
-// 构造新实例
-const request = service.create()
+import { mapRequest, mapResponse, transformData, transformSelect, getSampleMapping } from '@/utils/sugar'
+import { getDicts } from '@/api/system/dict/data'
+import {
+  sampleStoreInList,
+  sampleStoreInDelete,
+  sampleStoreIn,
+  sampleStoreInUpdate,
+  sampleStoreInUpdateDetail,
+  sampleWarehousePositions,
+  sampleStoreInCreate,
+  sampleWarehouseList,
+  sampleCustomerList,
+  sampleStoreInAudit,
+  sampleStoreInReject
+} from './sample'
 
-// 响应拦截器=》放在1号位
-request.interceptors.response.use(res => {
-  if (_.get(res.config.mapping, 'response')) {
-    // console.log('响应转换前：', _.cloneDeep(res.data))
-    res.data = resMapping(res.data, res.config.mapping.response)
-    // console.log('响应转换后', _.cloneDeep(res.data))
+const dict = getDicts('store_in_schema').then(res => res.data)
+
+function getSchema(pairSample) {
+  return {
+    request: dict.then(res => getSampleMapping(res, pairSample.request)),
+    response: dict.then(res => getSampleMapping(res, pairSample.response)),
+    sample: pairSample.request
   }
-  return res
-})
+}
 
-// 继承拦截器
-request.interceptors.response.handlers = _.concat(request.interceptors.response.handlers, service.interceptors.response.handlers)
-request.interceptors.request.handlers = _.concat(request.interceptors.request.handlers, service.interceptors.request.handlers)
+// 构造新实例
+const request = service.extend(service.defaults)
 
 // 请求拦截器=》放在1号位
-// ?用来映射接口数据，添加幽灵字段
-request.interceptors.request.use(config => {
+request.interceptors.request.use(async config => {
   // ? 允许重复提交
-  config.headers.repeatSubmit = false
+  // config.headers.repeatSubmit = false
 
-  // 自带mapping,还是通用mapping
-  if (_.get(config.mapping, 'request')) {
-    config.data = reqMapping(config.data, config.mapping.request)
+  const schema = config.schema
+  if (schema) {
+    config.data = mapRequest(config.data, await schema.request)
+    config.data = transformData(config.data, schema.sample)
   }
+  config.data = transformSelect(config.data)
 
-  transformSelect(undefined, undefined, config.data)
-
-  if (config.sample) {
-    config.data = transformData(config.data, config.sample)
-  }
   return config
+})
+
+// 响应拦截器=》放在1号位
+request.interceptors.response.unshift(async res => {
+  const schema = res.config.schema
+  if (schema) {
+    res.data = mapResponse(res.data, await schema.response)
+  }
+  return res
 })
 
 // ? 货物入仓->入仓单table:查询入仓单列表
@@ -53,17 +59,17 @@ export function storeInList({ data, params }) {
     method: 'post',
     data,
     params,
-    mapping: schemaStoreInList
+    schema: getSchema(sampleStoreInList)
   })
 }
 
 // ?删除入仓单
-export function delStoreIn(data) {
+export function storeInDelete(data) {
   return request({
     url: '/storage/hwrc/del',
     method: 'post',
     data,
-    mapping: schemaDelStoreIn
+    schema: getSchema(sampleStoreInDelete)
   })
 }
 
@@ -73,88 +79,30 @@ export function storeIn(dzid) {
   return request({
     url: `/storage/hwrc/detail/${dzid}/${shztn}`,
     method: 'post',
-    mapping: schemaStoreIn
+    schema: getSchema(sampleStoreIn)
   })
 }
 
 // ? 入仓单修改(外围)
-export function updateStoreIn(data) {
-  console.log(data)
-  const sample = {
-    'dzbz': '',
-    'dzid': '',
-    'dzzy10': '',
-    'dzzy6': '',
-    'dzzy7': '',
-    'dzzy8': '',
-    'iszxf': '',
-    'iszyl': '',
-    'wbdh': ''
-  }
+export function storeInUpdate(data) {
   return request({
     url: `/storage/hwrc/modifyInfo`,
     method: 'post',
     data,
-    sample,
-    mapping: schemaUpdateStoreIn
+    schema: getSchema(sampleStoreInUpdate)
   })
 }
 
 // ?入仓单修改（明细）
-export function updateStoreInDetail(data) {
-  // todo 修改入仓单，接口需要字段
-  // spdzld:条码id <==> $skuId
-  // spdzid:单证id <==> $billId
-  // spbhid:批号id <==> $batchId
-  // spkhmcid:客户id <==> $customerId
-  // spckid:仓库id <==> $warehouseId
-  console.log('$skuId', data.$skuId)
-  console.log('$billId', data.$billId)
-  console.log('$batchId', data.$batchId)
-  console.log('$customerId', data.$customerId)
-  console.log('$warehouseId', data.$warehouseId)
-  console.log('$positionId', data.$positionId)
-  // #region
-  const sample = {
-    'dzid': 0,
-    'itbz': '',
-    'khmc': '',
-    'khmcid': '',
-    'spbh': '',
-    'spbhid': '',
-    'spcd': '',
-    'spckid': '',
-    'spckid1': '',
-    'spcwid': '',
-    'spcwid1': '',
-    'spcwid3': '',
-    'spdzld': 0,
-    'spgh': '',
-    'spjs': '',
-    'spjs3': '',
-    'spjsl': '',
-    'spmc': '',
-    'spsl': '',
-    'spzs': '',
-    'ssrqid': '',
-    'ssrqid3': '',
-    'wbdh': '',
-    'wpggA': '',
-    'wpggB': '',
-    'wpggC': '',
-    'wpggD': '',
-    'wpggE': '',
-    'wpggF': '',
-    'wpggG': '',
-    'wpggH': ''
-  }
-  // #endregion
+export function storeInUpdateDetail(data) {
   return request({
     url: `/storage/hwrc/modify`,
     method: 'post',
     data,
-    sample,
-    mapping: schemaUpdateStoreInDetail
+    headers: {
+      repeatSubmit: false
+    },
+    schema: getSchema(sampleStoreInUpdateDetail)
   })
 }
 
@@ -163,60 +111,20 @@ export function warehousePositions(warehouseId) {
   return request({
     url: `/storage/category/selectPosition/${warehouseId}`,
     method: 'post',
-    mapping: schemaWarehousePositions
+    headers: {
+      repeatSubmit: false
+    },
+    schema: getSchema(sampleWarehousePositions)
   })
 }
 
 // ? 货物入仓->添加入仓单
-export function createStoreIn(data) {
-  // #region
-  const sample = {
-    'dzbz': '',
-    'dzid': 0,
-    'dzzy10': '',
-    'dzzy6': '',
-    'dzzy7': '',
-    'dzzy8': '',
-    'inp': [
-      {
-        'itbz': '',
-        'spbh': '',
-        'spcd': '',
-        'spcwid': '',
-        'spgh': '',
-        'spjs': '',
-        'spjsl': '',
-        'spmc': '',
-        'spsl': '',
-        'spzs': '',
-        'ssrqid': '',
-        'wpggA': '',
-        'wpggB': '',
-        'wpggC': '',
-        'wpggD': '',
-        'wpggE': '',
-        'wpggF': '',
-        'wpggG': '',
-        'wpggH': ''
-      }
-    ],
-    'iszxf': '',
-    'iszyl': '',
-    'khlx': '',
-    'khmc': '',
-    'khmcid': '',
-    'spckid': '',
-    'spckmc': '',
-    'szkhmc': '',
-    'wbdh': ''
-  }
-  // #endregion
+export function storeInCreate(data) {
   return request({
     url: `/storage/hwrc/add`,
     method: 'post',
     data,
-    sample,
-    mapping: schemaCreateStoreIn
+    schema: getSchema(sampleStoreInCreate)
   })
 }
 
@@ -242,7 +150,7 @@ export function warehouseList({ data, params } = {}) {
     method: 'post',
     data: Object.assign(_data, data),
     params: Object.assign(_params, params),
-    mapping: schemaWarehouseList
+    schema: getSchema(sampleWarehouseList)
   })
 }
 // ? 货物入仓->添加入仓单：获取客户列表
@@ -266,85 +174,25 @@ export function customerList({ data, params } = {}) {
     method: 'post',
     data: Object.assign(_data, data),
     params: Object.assign(_params, params),
-    mapping: schemaCustomerList
+    schema: getSchema(sampleCustomerList)
   })
 }
 
-// const commonIdMapping = {
-//   $customerId: 'khid',
-//   $warehouseId: 'spckid',
-//   $billId: 'dzid',
-//   $positionId: 'liid',
-//   $skuId: 'spdzld',
-//   $batchId: 'spbhid'
-// }
-// const commonMapping = {
-//   customerName: 'khmc',
-//   warehouse: 'spckmc',
-//   receiptDate: 'ssrqid',
-//   specification: 'spzs',
-//   $batchNo: 'spbh',
-//   $shipNo: 'spgh',
-//   $skuNo: 'sptm',
-//   number: 'spjs',
-//   pieceWeight: 'spjsl',
-//   totalWeight: 'spsl',
-//   brand: 'spcd',
-//   position: 'ckcw',
-//   creator: 'rsopmc',
-//   createDate: 'prrq',
-//   verifyDate: 'shrqid',
-//   skuRemark: 'spbz',
-//   billRemark: 'dzbz',
-//   $relativeNo: 'pzbh1',
-//   $outerNo: 'wbdh',
-//   $billNo: 'pzbh',
-//   verify: 'shzt',
-//   yarn: 'wpggA',
-//   tech: 'wpggB',
-//   process: 'wpggC',
-//   purpose: 'wpggD',
-//   origin: 'wpggE',
-//   bleach: 'wpggF',
-//   manufactureDate: 'wpggG',
-//   color: 'wpggH',
-//   plateNumber: 'dzzy6',
-//   linkman: 'dzzy7',
-//   phone: 'dzzy8',
-//   printCount: 'dzzy9',
-//   identity: 'dzzy10',
-//   realSettlement: 'dzzy12',
-//   stevedorage: 'iszxf',
-//   workingOut: 'iszyl',
-//   list: 'inp',
-//   splitNumber: 'spjs3',
-//   splitDate: 'ssrqid3'
-// }
+// 入仓单审核
+export function storeInAudit(data) {
+  return request({
+    url: `/storage/hwrc/audit`,
+    method: 'post',
+    data,
+    schema: getSchema(sampleStoreInAudit)
+  })
+}
 
-// export const receiveMapping = Object.assign({}, commonIdMapping, commonMapping)
-// export const publishMapping = Object.assign({}, commonIdMapping, commonMapping, {
-//   customerName: 'spkhmc',
-//   position: 'spcwid',
-//   startDate: 'rqid1',
-//   endDate: 'rqid2',
-//   skuRemark: 'itbz',
-
-//   // 仓库id
-//   $warehouseId: 'spckid', // ✔
-//   // 仓位id
-//   $positionId: 'spcwid', // ✔
-//   // 客户id
-//   $customerId: 'khmcid', // ✔
-
-//   // skuId
-//   $skuId: 'spdzld', // ✔
-//   // dzid
-//   $billId: 'dzid', // ✔
-//   // 批号id
-//   $batchId: 'spbhid'// ✔
-
-// })
-
-// ?这个后端的接口对不上，心很累，一堆属性，没有中文字段，一个id三种属性名
-
-// ?做了字段映射，还是对不上，频繁的未响应
+// 入仓单驳回
+export function storeInReject(id) {
+  return request({
+    url: `/storage/hwrc/reject/${id}`,
+    method: 'post',
+    schema: getSchema(sampleStoreInReject)
+  })
+}

@@ -1,4 +1,5 @@
 import axios from 'axios'
+const InterceptorsManager = require('axios/lib/core/InterceptorManager')
 import { Notification, MessageBox, Message, Loading } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
@@ -8,7 +9,25 @@ import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
 import {routeMap} from '@/config/routeMapConfig'
 import _ from 'lodash'
+import { wrap } from '@/utils/sugar'
 
+//?增强我的axios
+//todo 让axios添加extend()方法，比create()强在可以继承拦截器
+axios.extend = axios.Axios.prototype.extend = wrap(axios,'create',function(origin,instanceConfig){
+  //在这里插入继承拦截器的逻辑
+  const instance = origin.call(this,instanceConfig)
+  instance.interceptors.request.handlers = [...this.interceptors.request.handlers]
+  instance.interceptors.response.handlers = [...this.interceptors.response.handlers]
+  return instance
+})
+
+//todo 在InterceptorManager的原型上添加unshift方法
+InterceptorsManager.prototype.unshift = function(fulfilled,rejected){
+   this.handlers.unshift({
+    fulfilled,
+    rejected,
+  })
+}
 
 let downloadLoadingInstance
 // 是否显示重新登录

@@ -13,15 +13,15 @@ SugarForm 是自制的动态渲染表单，集成了响应式布局，数据驱�
 
 SugarFieldsetCard 是自制的动态渲染表单，后续考虑合并到 SugarForm
 
-SugarInput 是根据传入的 inputType 渲染不同类型 element-input 的组件
+SugarTypeIn 是根据传入的 inputType 渲染不同类型 element-input 的组件
 
 SugarEditTable 是自制的可编辑 table，有行内编辑和表单编辑两种模式。
 
 ### 后期考虑
 
-封装 SugarTable，将气泡和横滚集成到 table 中，（完成，用时一天）
+封装 SugarTable，将气泡和横滚集成到 table 中
 
-将 SugarFieldsetCard 的逻辑合并到 SugarForm 中(完成，用时1小时)
+将 SugarFieldsetCard 的逻辑合并到 SugarForm 中
 
 给 SugarEditTable 添加气泡校验信息（遇到坑了，el-table会渲染3次，导致3个气泡）
 
@@ -47,6 +47,6 @@ el-table会将数据渲染3遍，左右固定列，还有正常列
 
 SugarEditTable 的气泡校验信息要实现怎样的效果？
 
-思考：输入的时候不进行校验，只有提交时才进行校验
-再思考：校验时，不符合要求的单元格全部放出气泡
-思考：鼠标移动到气泡上时，整行气泡要消失，鼠标移动开后要显示（给气泡添加hover事件，或者给气泡添加mouseenter，给表格行添加mouseleave）
+输入的时候不进行校验，只有提交时才进行校验
+校验时，不符合要求的单元格全部放出气泡
+鼠标移动到气泡上时，整行气泡要消失，鼠标移动开后要显示（给气泡添加hover事件，或者给气泡添加mouseenter，给表格行添加mouseleave）

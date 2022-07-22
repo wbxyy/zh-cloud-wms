@@ -5,12 +5,12 @@
         <span>{{group}}</span>
       </div>
       <div class="card-form-padding">
-        <template v-for="(_,index) in formLabel">
+        <template v-for="(_,index) in filterLabel">
           <el-row  v-if="index%formCol===0" :key="index">
-            <el-col v-for="item in formLabel.filter((item,i)=>item.renderGroup===group && i>=index && i<index+Number(formCol))" :key="item.key" :xl="xl" :lg="lg" :md="md" :sm="sm" :xs="xs">
+            <el-col v-for="item in filterLabel.filter((item,i)=>item.renderGroup===group && i>=index && i<index+Number(formCol))" :key="item.key" :xl="xl" :lg="lg" :md="md" :sm="sm" :xs="xs">
               <el-form-item :label="item.label" :label-width="item.labelWidth" :prop="item.key" >
 
-                <SugarInput :form-item="item" :value="formData" :method-obj="methodObj" ></SugarInput>
+                <SugarTypeIn :form-item="item" :value="formData" :method-obj="methodObj" ></SugarTypeIn>
               </el-form-item>
             </el-col>
           </el-row>
@@ -22,11 +22,11 @@
 </template>
 
 <script>
-import SugarInput from '@/components/SugarInput'
+import SugarTypeIn from '@/components/SugarTypeIn'
 export default {
   name:'SugarForm',
   components:{
-    SugarInput
+    SugarTypeIn
   },
   props:['formLabel','formData',"formCol",'methodObj','size'],
   props:{
@@ -40,9 +40,12 @@ export default {
     }
   },
   computed:{
+    filterLabel(){
+      return this.formLabel.filter(f=>f.labelVisible??true).sort((a,b)=>(b.labelOrder??0) - (a.labelOrder??0))
+    },
     fieldSet(){
       const result = []
-      this.formLabel.forEach((item, index) => {
+      this.filterLabel.forEach((item, index) => {
         if (result.filter(i => i.renderGroup === item.renderGroup).length === 0) {
           result.push(item)
         }
@@ -51,7 +54,7 @@ export default {
       return result.map(item => item.renderGroup)
     },
     rules(){
-      const entries = this.formLabel.map(item=>[item.key,item.rule])
+      const entries = this.filterLabel.map(item=>[item.key,item.rule])
       return Object.fromEntries(entries)
     },
     xl() {

@@ -17,26 +17,25 @@
       <el-option label='中' :value="6"></el-option>
       <el-option label='窄' :value="12"></el-option>
     </el-select>
-    <SugarForm ref="SugarForm" :form-label="tableColumns" :form-data="row" :form-col="formCol" :size="size"></SugarForm>
+    <SugarForm ref="SugarForm" :form-label="tableColumns" :form-data="row" :form-col="formCol" size="small"></SugarForm>
   </el-dialog>
 
   <!-- 表格 -->
-  <el-card class="card-container" shadow="never">
-    <div class="card-padding card-title">
+  <el-card class="little-margin-top" shadow="never">
+    <div v-show="editMode" class="card-padding card-title">
       <el-button type="info" @click="editInline?handleAddRowInline():handleAddRow()">{{ editInline?"添加编辑行":"进入表单录入" }}</el-button>
-    <!-- <span v-show="editInline">——双击行进行编辑</span> -->
     </div>
 
     <!-- 用来提示校验的气泡 -->
     <el-popover trigger="manual" :value="Boolean(err)" placement="top">
       <!-- 表单域，校验域是一行 -->
       <el-form  slot="reference" ref="form" :model="tableData[currentRow]" :rules="rules" :size="size">
-      <el-table :data="tableData" border fit size="mini" @cell-click="handleEditRowInline" row-key="$sugarRowId" @hook:updated="tableUpdate">
+      <el-table :data="tableData" border fit :size="size" @cell-click="handleEditRowInline" row-key="$sugarRowId" @hook:updated="tableUpdate">
         <!-- <el-table-column>
           <input type="text">
         </el-table-column> -->
         <el-table-column prop="operation" label="操作" align="center" class-name="small-padding fixed-width" min-width="130px" width="130px">
-          <template v-if="editMode" slot="header" slot-scope="scope">
+          <template slot="header" slot-scope="scope">
             <el-switch v-model="editInline" inactive-text="编辑模式" />
           </template>
           <template slot-scope="scope">
@@ -55,44 +54,35 @@
             >删除</el-button>
           </template>
         </el-table-column>
-        <el-table-column v-for="(item) in tableColumns" :key="item.key" :label="item.label" :align="item.align" :prop="item.key" :width="item.width?item.width:defaultWidth(item)" :fixed="item.fixed" :header-align="item.headerAlign?item.headerAlign:'center'" >
+        <el-table-column v-for="(item) in filterColumns" :key="item.key" :label="item.label" :align="item.align" :prop="item.key" :width="item.width?item.width:defaultWidth(item)" :fixed="item.fixed" :header-align="item.headerAlign?item.headerAlign:'center'" >
           <template slot-scope="scope">
             <div v-show="editInline && currentRow===scope.$index" >
               <el-form-item :prop="item.key" >
-                <SugarInput :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index]" ></SugarInput>
+                <SugarTypeIn :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index]" ></SugarTypeIn>
               </el-form-Item>
             </div>
             <div v-show="!(editInline && currentRow===scope.$index)">
               <span v-if="item.align==='center'">{{ scope.row[item.key] }}</span>
+              <span v-else-if="item.inputType === 1">
+                {{getLabel(scope.$index,item.key)}}
+              </span>
               <span v-else style="padding-left:15px;padding-right:20px;display:flex;justify-content:space-between;">
-                <div v-if="item.inputType === 1">
-                  <span>{{getLabel(scope.$index,item.key)}}</span>
-                </div>
-                <div v-else>
                   <span>{{tableData[scope.$index][item.key]}}</span>
                   <span>{{item.unit}}</span>
-                </div>
-
               </span>
             </div>
-
           </template>
         </el-table-column>
       </el-table>
       </el-form>
-      {{tableData}}
       <span style="color:red">{{err}}</span>
     </el-popover>
-
-
-
-
   </el-card>
 </div>
 </template>
 
 <script>
-import SugarInput from '@/components/SugarInput'
+import SugarTypeIn from '@/components/SugarTypeIn'
 import SugarForm from '@/components/SugarForm'
 import _ from 'lodash'
 
@@ -100,7 +90,7 @@ let row = null
 export default {
   name:'sugarEditTable',
   components:{
-    SugarInput,
+    SugarTypeIn,
     SugarForm,
   },
   props:{
@@ -113,6 +103,10 @@ export default {
     size:{
       type:String,
       default:'medium'
+    },
+    allowEmpty:{
+      type:Boolean,
+      default:false
     }
   },
   watch:{
@@ -120,10 +114,8 @@ export default {
       deep:true,
       handler(list){
         list.forEach(item=>{
-
           //如果是请求过来的数据，打上标记
           if(!item.hasOwnProperty('$sugarRowId')){
-
             //没有打上标记的数据，先执行filter再打上标记(数据流是循环的，filter只在初始化数据时生效)
             //!执行filter的位置
             for(const key in item){
@@ -132,18 +124,20 @@ export default {
                 item[key] = col.filter(item[key])
               }
             }
-
             item.$sugarRowId = ++this.nextRowId
           }
         })
       }
     }
   },
-
   computed:{
     rules(){
       const entries = this.tableColumns.map(item=>[item.key,item.rule])
       return Object.fromEntries(entries)
+    },
+    filterColumns(){
+      //undefined时为true
+      return this.tableColumns.filter(f=>f.columnVisible??true).sort((a,b)=>(b.columnOrder??0) - (a.columnOrder??0))
     },
   },
   data(){
@@ -157,7 +151,7 @@ export default {
       // 弹窗表单的标题
       dialogTitle:'',
       // 切换明细输入方式
-      editInline:this.editMode,
+      editInline:false,
       // 聚焦的行
       currentRow:0,
       row:null,
@@ -223,8 +217,9 @@ export default {
           if (this.tableData.filter(item => item.$sugarRowId === this.row.$sugarRowId).length > 0) {
             // 编辑逻辑
             this.$modal.msg('你编辑了一个条码')
-            this.tableData[this.currentRow] = this.row
+            this.$set(this.tableData,this.currentRow,this.row)
             this.$modal.msg(this.currentRow)
+
             this.row = row
           } else {
             // 提交逻辑
@@ -241,11 +236,10 @@ export default {
     validate(){
       //?要不，循环校验，每次校验一行，怎么样呢
        //?写法1
-      let p = Promise.resolve()
+      let p = Promise.resolve(this.allowEmpty)
       this.currentRow = 0
 
       this.tableData.forEach((item,index)=>{
-        console.log(item);
         p = p.then(()=>{
           return this.$refs.form.validate().then((value)=>{
             this.currentRow++
@@ -255,17 +249,17 @@ export default {
       })
 
       return p.then(value=>{
-        if(this.tableData.length===0){
+        if(!value){
           const msg = '明细不能为空'
           this.$modal.alert(msg)
           throw msg
         }
         return value
       }).catch(err=>{
+        this.editInline = true
         Object.values(err).every(item=>{
           this.err = item[0].message
         })
-
         throw err
       })
 

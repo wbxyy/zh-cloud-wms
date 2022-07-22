@@ -28,7 +28,7 @@
           @click="handleEdit"
         >修改</el-button>
       </el-col> -->
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="danger"
           plain
@@ -37,7 +37,7 @@
           :disabled="multiple"
           @click="handleDelete"
         >删除</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -46,6 +46,17 @@
           size="mini"
           @click="handleExport"
         >导出</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          plain
+          icon="el-icon-check"
+          size="mini"
+          :disabled="multiple"
+          class="error"
+          @click="handleAudit"
+        >审核</el-button>
       </el-col>
       <right-toolbar :show-search.sync="showSearch" :columns="tableColumns" @queryTable="getList" />
     </el-row>
@@ -71,13 +82,13 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
           >修改</el-button>
-          <el-button
+          <!-- <el-button
             v-hasPermi="['zhcloud:shop:remove']"
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-          >删除</el-button>
+          >删除</el-button> -->
         </template>
       </el-table-column>
 
@@ -101,13 +112,30 @@
 import SugarTable from '@/components/SugarTable'
 import SugarForm from '@/components/SugarForm'
 import { tableColumns, formLabel } from './data.js'
-import { storeInList, warehousePositions } from '@/api/zh/cloud/wms/store_in'
+import { storeInList, storeInAudit } from '@/api/zh/cloud/wms/store_in'
 import _ from 'lodash'
 export default {
   name: 'StoreIn',
   components: {
     SugarTable,
     SugarForm
+  },
+  beforeRouteEnter(to, from, next) {
+    // 疑问：为什么没有进beforeRouteUpdate
+    // console.log('enter')
+    next(vc => {
+      if (to.params.refresh) {
+        vc.getList()
+      }
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    // console.log('leave')
+    next()
+  },
+  beforeRouteUpdate(to, from, next) {
+    // console.log('update')
+    next()
   },
   data() {
     return {
@@ -184,7 +212,9 @@ export default {
   methods: {
     getList() {
       this.loading = true
-      ;[this.queryParams.startDate, this.queryParams.endDate] = this.queryParams._receiptDate
+      if (this.queryParams._receiptDate) {
+        [this.queryParams.startDate, this.queryParams.endDate] = this.queryParams._receiptDate
+      }
 
       storeInList({
         data: this.queryParams,
@@ -209,8 +239,8 @@ export default {
       this.handleQuery()
     },
     // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
+    handleSelectionChange({ selection }) {
+      this.ids = selection.map(item => item.$billId)
       this.single = selection.length !== 1
       this.multiple = !selection.length
     },
@@ -223,9 +253,9 @@ export default {
     //   this.$router.push({ name: 'EditStoreIn' })
     // },
     /** 删除按钮操作 */
-    handleDelete(row) {
-      // const ids = row.id || this.ids
-    },
+    // handleDelete(row) {
+    //   // const ids = row.id || this.ids
+    // },
     /** 导出按钮操作 */
     handleExport() {
       // this.$modal.msg('导出功能')
@@ -251,6 +281,20 @@ export default {
     },
     handleHeaderDragend(newWidth, oldWidth, column, event) {
       // console.log('你拖动了表头')
+    },
+    handleAudit(row) {
+      const data = this.list.filter(f => {
+        return this.ids.includes(f.$billId)
+      })
+
+      this.$modal.confirm(`是否确认审核${this.ids.length}条数据项`).then(() => {
+        return storeInAudit(data)
+      }).then(res => {
+        this.getList()
+        this.$modal.msgSuccess(`批量审核成功，共${this.ids.length}项`)
+      }).catch(err => {
+        this.$modal.msgError(`批量审核失败`, err)
+      })
     }
   }
 }

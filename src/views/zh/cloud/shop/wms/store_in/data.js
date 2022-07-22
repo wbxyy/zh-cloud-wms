@@ -7,10 +7,9 @@
 //? 4:switch
 import _ from 'lodash'
 import { warehouseList,warehousePositions } from '@/api/zh/cloud/wms/store_in'
-// let warehouse = warehouseList()
+let warehouse = warehouseList()
 export function getWarehouseOptions(){
-  // return warehouse.then(res=>{
-    return warehouseList().then(res=>{
+  return warehouse.then(res=>{
     return res.rows.map(item=>({
       label:item.warehouse,
       value:item.$warehouseId
@@ -64,7 +63,7 @@ export function getBleach(){
   })
 }
 
-//region
+//#region
 export const tableColumns = [
   {
     label: '打印次数',//!dzzy9
@@ -212,7 +211,7 @@ export const tableColumns = [
     tip: true
   }
 ]
-//endregion
+//#endregion
 
 export const formLabel = [
     {
@@ -239,7 +238,11 @@ export const formLabel = [
       key: '_receiptDate',
       label: '入仓日期',
       inputType:2,
-      dateType:'daterange'
+      type:'daterange',
+      startPlaceholder:"开始日期",
+      endPlaceholder:"结束日期",
+      rangeSeparator:"至",
+      valueFormat:"yyyy-MM-dd"
     },
     {
       key: '$skuNo',
@@ -292,5 +295,6 @@ export const formLabel = [
       key: 'plateNumber',
       label: '车牌',
       inputType:0,
+      error:true
     },
 ]
