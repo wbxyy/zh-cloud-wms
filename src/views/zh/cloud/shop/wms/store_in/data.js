@@ -5,6 +5,7 @@
 //? 2:date-picker
 //? 3:button
 //? 4:switch
+import moment from 'moment'
 import _ from 'lodash'
 import { warehouseList,warehousePositions } from '@/api/zh/cloud/wms/store_in'
 let warehouse = warehouseList()
@@ -67,148 +68,111 @@ export function getBleach(){
 export const tableColumns = [
   {
     label: '打印次数',//!dzzy9
-    prop: 'printCount',
     key: 'printCount',
-    visible: true,
     width: '80px',
     align: 'center',
-    tip: true,
     fixed: true
   },
   {
     label: '入仓日期',//!ssrqid
-    prop: 'receiptDate',
-    key: 'receiptDate',
-    visible: true,
+    key: 'date',
     width: '120px',
     align: 'center',
-    tip: true
   },
   {
     label: '客户',//!khmc
-    prop: 'customerName',
     key: 'customerName',
-    visible: true,
     width: '240px',
     align: 'center',
-    tip: true
   },
   {
     label: '入仓件数',//!spjs
-    prop: 'number',
     key: 'number',
-    visible: true,
     width: '80px',
     align: 'center',
-    tip: true
+    //!接口数据是带逗号的字符串
+    // filter(val){
+    //   console.log(val,Number(val||0));
+    //   return Math.round(Number(val||0)*100)/100
+    // },
   },
   {
     label: '入仓重量（吨）',//!spsl
-    prop: 'totalWeight',
     key: 'totalWeight',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
+    // filter(val){
+    //   return Math.round(Number(val||0)*100)/100
+    // },
   },
   {
     label: '物品规格',//!spzs
-    prop: 'specification',
     key: 'specification',
-    visible: true,
     width: '150px',
     align: 'center',
-    tip: true
   },
   {
     label: '车牌',//!dzzy6
-    prop: 'plateNumber',
     key: 'plateNumber',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
   },
   {
     label: '创建人',//!rsopmc
-    prop: 'creator',
     key: 'creator',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
   },
   {
     label: '创建时间',//!prrq
-    prop: 'createDate',
     key: 'createDate',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
+    filter(val){
+      return moment(val).format('YYYY-MM-DD')
+    }
   },
   {
     label: '审核日期',//!SHrqid
-    prop: 'verifyDate',
     key: 'verifyDate',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
   },
   {
     label: '单证备注',//!dzbz
-    prop: 'billRemark',
     key: 'billRemark',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
   },
   {
     label: '关联单号',//!yydh
-    prop: '$relativeNo',
     key: '$relativeNo',
-    visible: true,
     width: '80px',
     align: 'center',
-    tip: true,
   },
   {
     label: '外部单号',//!wbdh
-    prop: '$outerNo',
     key: '$outerNo',
-    visible: true,
     width: '80px',
     align: 'center',
-    tip: true
   },
   {
     label: '单号',//!pzbh
-    prop: '$billNo',
     key: '$billNo',
-    visible: true,
     width: '80px',
     align: 'center',
-    tip: true
   },
   {
     label: '审核状态',//!shzt
-    prop: 'verify',
     key: 'verify',
-    visible: true,
     width: '80px',
     align: 'center',
-    tip: true
   },
   {
     label: '实际结算方',//!dzzy12
-    prop: 'realSettlement',
     key: 'realSettlement',
-    visible: true,
     width: '120px',
     align: 'center',
-    tip: true
   }
 ]
 //#endregion
@@ -295,6 +259,6 @@ export const formLabel = [
       key: 'plateNumber',
       label: '车牌',
       inputType:0,
-      error:true
+      error:'sql错误'
     },
 ]

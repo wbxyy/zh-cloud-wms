@@ -36,20 +36,43 @@
 <script>
 import SugarToolTip from '@/components/SugarToolTip'
 import SugarScrollBar from '@/components/SugarScrollBar'
+import _ from 'lodash'
 export default {
   name:'SugarTable',
   components:{
     SugarToolTip,
     SugarScrollBar
   },
-  props:['data','loading','size','fit','border'],
-
+  props:['data','loading','size','fit','border','tableColumns'],
+  watch:{
+    data:{
+      deep:true,
+      handler(list){
+        if(!this.tableColumns) return
+        list.forEach(item=>{
+          //!执行filter的位置
+          for(const key in item){
+            const col = this.filterColumns.find(col => col.key === key)
+            if (_.get(col, 'filter')) {
+              item[key] = col.filter(item[key])
+            }
+          }
+        })
+      }
+    }
+  },
   mounted() {
     this.initFixedHead()
     window.addEventListener('scroll', this.scrollEvent)
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.scrollEvent)
+  },
+  computed:{
+     filterColumns(){
+      //undefined时为true
+      return this.tableColumns.filter(f=>f.columnVisible??true).sort((a,b)=>(b.columnOrder??0) - (a.columnOrder??0))
+    },
   },
   data(){
     return {
@@ -104,11 +127,14 @@ export default {
         }
 
         setTimeout(() => {
-          this.fixedHeadWidth = this.$refs.table.$el.querySelector('.el-table__fixed').getBoundingClientRect().width
-          headBox.insertAdjacentElement('afterbegin', wrapper.cloneNode(true))
-          fixedHeadBox.insertAdjacentElement('afterbegin', fixedWrapper.cloneNode(true))
-          const scroll = this.$refs.table.$el.querySelector('.el-table__header-wrapper').scrollLeft
-          headBox.querySelector('.el-table__header-wrapper').scroll({ top: 0, left: scroll })
+          const $elFixed = this.$refs.table.$el.querySelector('.el-table__fixed')
+          if($elFixed){
+            this.fixedHeadWidth = $elFixed.getBoundingClientRect().width
+            headBox.insertAdjacentElement('afterbegin', wrapper.cloneNode(true))
+            fixedHeadBox.insertAdjacentElement('afterbegin', fixedWrapper.cloneNode(true))
+            const scroll = this.$refs.table.$el.querySelector('.el-table__header-wrapper').scrollLeft
+            headBox.querySelector('.el-table__header-wrapper').scroll({ top: 0, left: scroll })
+          }
         }, 0)
       })
     },

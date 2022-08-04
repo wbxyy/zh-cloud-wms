@@ -5,6 +5,9 @@ import dialogDragWidth from './dialog/dragWidth'
 import dialogDragHeight from './dialog/dragHeight'
 import clipboard from './module/clipboard'
 import focus from './focus'
+import error from './error'
+import throttle from './throttle'
+import tooltip from './tooltip'
 
 const install = function(Vue) {
   Vue.directive('hasRole', hasRole)
@@ -14,6 +17,9 @@ const install = function(Vue) {
   Vue.directive('dialogDragWidth', dialogDragWidth)
   Vue.directive('dialogDragHeight', dialogDragHeight)
   Vue.directive('focus',focus)
+  Vue.directive('error',error)
+  Vue.directive('throttle',throttle)
+  Vue.directive('tooltip',tooltip)
 }
 
 if (window.Vue) {

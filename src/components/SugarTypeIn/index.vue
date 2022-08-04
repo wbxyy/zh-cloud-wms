@@ -2,8 +2,7 @@
   <div>
     <component
     :is="name"
-    :class="[bindClass,{error:item.error}]"
-    v-if="item.inputType!==undefined"
+    :class="[bindClass]"
     v-bind="item"
     :item="item"
     :form-data="value"
@@ -11,9 +10,8 @@
     v-model.trim="model"
     :placeholder="item.placeholder?item.placeholder: shortHolder?item.label:`请输入${item.label}`"
     clearable
-    :disabled="item.disabled"
+    :disabled="disabled"
     ></component>
-
     <!-- <el-input
     v-if="item.inputType===0"
     v-model.trim="model"
@@ -70,7 +68,7 @@
     :inactive-value="item.inactiveValue"
     v-model="model" /> -->
 
-    <span v-else>{{ model }}</span>
+
   </div>
 </template>
 
@@ -78,13 +76,15 @@
 import SugarSelect from '@/components/SugarSelect'
 import SugarInput from '@/components/SugarInput'
 import SugarButton from '@/components/SugarButton'
+import SugarRawText from '@/components/SugarRawText'
 import _ from 'lodash'
 export default {
   name:'SugarTypeIn',
   components:{
     SugarSelect,
     SugarInput,
-    SugarButton
+    SugarButton,
+    SugarRawText
   },
   props:{
     formItem:Object,
@@ -119,7 +119,7 @@ export default {
         case 2: componentName='ElDatePicker';break;
         case 3: componentName='SugarButton';break;
         case 4: componentName='ElSwitch';break;
-        default: componentName='';break;
+        default: componentName='SugarRawText';break;
       }
       return componentName
     },
@@ -147,6 +147,15 @@ export default {
         this.value[this.key] = val
       }
     },
+    disabled(){
+      let flag = false
+      if(typeof this.item.disabled === 'function'){
+        flag = this.item.disabled(this.value)
+      }else{
+        flag = this.item.disabled
+      }
+      return flag
+    }
   },
   methods:{
     noop(){

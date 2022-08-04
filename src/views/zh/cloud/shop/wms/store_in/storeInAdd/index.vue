@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <!-- 标题start -->
     <el-card shadow="never">
       <div class="card-title card-padding">
         <div class="card-info">
@@ -16,7 +17,9 @@
         </div>
       </div>
     </el-card>
+    <!-- 标题end -->
 
+    <!-- 客户抽屉start -->
     <el-drawer
       title="选择客户"
       :visible.sync="customerDrawer"
@@ -33,7 +36,9 @@
       </div>
 
     </el-drawer>
+    <!-- 客户抽屉end -->
 
+    <!-- 仓库抽屉start -->
     <el-drawer
       title="选择仓库"
       :visible.sync="warehouseDrawer"
@@ -50,27 +55,45 @@
       </div>
 
     </el-drawer>
+    <!-- 仓库抽屉end -->
 
+    <!-- 表单start -->
     <SugarForm
       ref="SugarForm"
-      class="little-margin-top filter-container"
+      class="little-margin-top"
       :form-label="formLabel"
       :form-data="formData"
       :form-col="formCol"
       :method-obj="methodObj"
     >
-      <div class="fr filter-item">
+      <div class="fr tinny-margin-bottom">
         <el-button @click="handleReset">重置</el-button>
       </div>
     </SugarForm>
+    <!-- 表单end -->
+
+    <!-- 操作栏start -->
+    <div class="operation tinny-margin-top">
+      <el-button v-show="formData.warehouse" type="primary" @click="handleAddRow">新增</el-button>
+    </div>
+    <!-- 操作栏end -->
+
+    <!-- 表格start -->
     <SugarEditTable
       v-show="formData.warehouse"
       ref="SugarEditTable"
+      class="tinny-margin-top"
       :table-data="list"
       :table-columns="tableColumns"
     />
+    <!-- 表格end -->
 
-    <el-button size="medium" type="warning" @click="handleSubmit">提交入仓单</el-button>
+    <!-- footer_start -->
+    <div class="footer little-margin-top">
+
+      <el-button type="warning" @click="handleSubmit">提交入仓单</el-button>
+    </div>
+    <!-- footer_end -->
 
   </div>
 </template>
@@ -80,7 +103,6 @@ import { formLabel, tableColumns } from './data'
 import { customerList, warehouseList, storeInCreate, warehousePositions } from '@/api/zh/cloud/wms/store_in'
 import SugarForm from '@/components/SugarForm'
 import SugarEditTable from '@/components/SugarEditTable'
-import _ from 'lodash'
 const formData = {
   customerName: null, //! 客户名#
   $customerId: null, //! 客户id
@@ -95,7 +117,7 @@ const formData = {
   billRemark: null, //! 单证备注✔#
   stevedorage: `1`, //! 装卸费(1代表inactive)✔#
   workingOut: `1`, //! 作业量(1代表inactive)✔#
-  items: []//! 入仓条码明细
+  list: []//! 入仓条码明细
 }
 export default {
   name: 'StoreInAdd',
@@ -171,6 +193,9 @@ export default {
   },
 
   methods: {
+    handleAddRow() {
+      this.$refs.SugarEditTable.add()
+    },
     showCustomerDrawer() {
       this.customerDrawer = true
     },

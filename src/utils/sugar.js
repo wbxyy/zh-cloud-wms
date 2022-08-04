@@ -1,4 +1,5 @@
 
+import {sampleStoreIn} from '@/api/zh/cloud/wms/store_in/sample'
 import _ from 'lodash'
 
 //? 转换函数，将组件formData和接口的sample融合，组合出带有幽灵属性的formData
@@ -140,6 +141,8 @@ export function mapResponse(data,mapping){
  * @returns
  */
 export function mapRequest(data,mapping){
+  console.log(data);
+  console.log(mapping);
   const result = handler(data,mapping)
   return result
 }
@@ -184,6 +187,10 @@ export function getSampleField(sample){
  * @param {*} sample swagger接口的请求示例sample
  * @returns 接口字段映射
  */
+//? 这里要做些功夫，sample不能整体平铺成一维直接mapping，而是要按子孙对象来平铺，每个子孙各自进行mapping
+//? getSampleField能获取字段数组，此时不能作用于整体sample，而是要对sample进行深度优先遍历，作用于子孙对象
+//? 即此处的sample不是整体sample，应为sample的遍历出的顶层对象或内嵌对象。
+//?getSampleMapping起初是得到一维的mapping表，供mapRequest和mapResponse进行转换
 export function getSampleMapping(dict,sample){
   const fields = getSampleField(sample)
   return Object.fromEntries(dict.filter(f => fields.find(i => i === f.dictLabel)).map(m => ([m.dictValue, m.dictLabel])))
@@ -203,4 +210,58 @@ export function wrap(target,key,wrapper){
     args.unshift(fn);
     return wrapper.apply(this,args)
   }
+}
+
+/**
+ * 将String转ArrayBuffer
+ * @param {*} s 字符串
+ * @returns buffer数组
+ */
+export function s2ab(s){
+  const buff = new ArrayBuffer(s.length)
+  const view = new Uint8Array(buff)
+  for(let i=0;i!=s.length;++i){
+    view[i] = s.charCodeAt(i) & 0xff
+  }
+  return buff
+}
+
+
+//从element-ui的form-item源码上抄过来的（判断form-item是否为required的函数，项目内不需要使用，form-item有isRequired属性可以判断字段是否为required）
+//获取formRule中具体的PropRule
+export function getPropByPath(obj, path, strict) {
+  let tempObj = obj;
+  path = path.replace(/\[(\w+)\]/g, '.$1');
+  path = path.replace(/^\./, '');
+
+
+  let keyArr = path.split('.');
+  let i = 0;
+  for (let len = keyArr.length; i < len - 1; ++i) {
+    if (!tempObj && !strict) break;
+    let key = keyArr[i];
+    if (key in tempObj) {
+      tempObj = tempObj[key];
+    } else {
+      if (strict) {
+        throw new Error('please transfer a valid prop path to form item!');
+      }
+      break;
+    }
+  }
+  return {
+    o: tempObj,
+    k: keyArr[i],
+    v: tempObj ? tempObj[keyArr[i]] : null
+  };
+};
+
+//获取文本的宽度(不好用，不准确，别用，因为获取当前适用的fontFamily难如登天)
+export function getActualWidthOfChar(text,options = {}){
+  const {fontSize=14,fontFamily='Microsoft YaHei'} = options
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  ctx.font = `${fontSize}px ${fontFamily}`
+  const metrics = ctx.measureText(text);
+  return Math.abs(metrics.actualBoundingBoxLeft) + Math.abs(metrics.actualBoundingBoxRight)
 }

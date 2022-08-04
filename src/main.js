@@ -42,6 +42,10 @@ import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
 
+import AFTableColumn from 'af-table-column'
+
+Vue.use(AFTableColumn)
+
 
 
 

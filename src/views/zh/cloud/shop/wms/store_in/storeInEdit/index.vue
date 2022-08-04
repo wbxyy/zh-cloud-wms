@@ -19,7 +19,7 @@
 
     <SugarForm
       ref="SugarForm"
-      class="little-margin-top filter-container"
+      class="little-margin-top"
       :form-label="formLabel"
       :form-data="formData"
       :form-col="formCol"
@@ -30,15 +30,16 @@
     </SugarForm>
     <SugarEditTable
       ref="SugarEditTable"
+      class="tinny-margin-top"
       :table-data="list"
       :table-columns="tableColumns"
-      :edit-mode="false"
       :allow-empty="true"
     />
 
-    <el-button type="primary" @click="handleSubmit">提交更新</el-button>
-
-    <el-button type="primary" @click="handleAudit">{{ verify }}</el-button>
+    <div class="footer little-margin-top">
+      <el-button type="warning" @click="handleSubmit">提交更新</el-button>
+      <el-button type="primary" @click="handleAudit">{{ verify||'审核' }}</el-button>
+    </div>
   </div>
 </template>
 
@@ -156,10 +157,6 @@ export default {
   activated() {
     this.getData()
   },
-  mounted() {
-
-  },
-
   methods: {
     getData() {
       // 回显数据

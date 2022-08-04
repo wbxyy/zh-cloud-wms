@@ -88,37 +88,7 @@ export const constantRoutes = [
       }
     ]
   },
-  {
-    path: '/wms/store_in',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@view/wms/store_in/index'),
-        name: 'StoreIn',
-        meta: { title: '货物入仓', activeMenu: '/wms/store_in/index' }
-      },
-      {
-        path: 'test',
-        component: () => import('@view/wms/store_in/test'),
-        name: 'storeInTest',
-        meta: { title: '货物入仓测试', activeMenu: '/wms/store_in/test' }
-      },
-      {
-        path: 'add',
-        name: 'StoreInAdd',
-        component: () => import('@view/wms/store_in/storeInAdd/index'),
-        meta: { title: '添加入仓',activeMenu:'/wms/store_in/StoreInAdd/index' }
-      },
-      {
-        path: 'edit',
-        name: 'StoreInEdit',
-        component: () => import('@view/wms/store_in/storeInEdit/index'),
-        meta: { title: '编辑入仓',activeMenu:'/wms/store_in/StoreInEdit/index' }
-      },
-    ]
-  },
+
 
   //? 分析比写代码更重要
   //? 先把路由写在静态，后续得到权限字符串后再写在动态
@@ -196,6 +166,62 @@ export const dynamicRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/wms/store_in',
+  //   component: Layout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@view/wms/store_in/index'),
+  //       name: 'StoreIn',
+  //       meta: { title: '货物入仓', activeMenu: '/wms/store_in/index' }
+  //     },
+  //     {
+  //       path: 'test',
+  //       component: () => import('@view/wms/store_in/test'),
+  //       name: 'storeInTest',
+  //       meta: { title: '货物入仓测试', activeMenu: '/wms/store_in/test' }
+  //     },
+  //     {
+  //       path: 'add',
+  //       name: 'StoreInAdd',
+  //       component: () => import('@view/wms/store_in/storeInAdd/index'),
+  //       meta: { title: '添加入仓',activeMenu:'/wms/store_in/StoreInAdd/index' }
+  //     },
+  //     {
+  //       path: 'edit',
+  //       name: 'StoreInEdit',
+  //       component: () => import('@view/wms/store_in/storeInEdit/index'),
+  //       meta: { title: '编辑入仓',activeMenu:'/wms/store_in/StoreInEdit/index' }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/wms/store_out',
+  //   component: Layout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@view/wms/store_out/index'),
+  //       name: 'StoreOut',
+  //       meta: { title: '货物出仓', activeMenu: '/wms/store_out/index' }
+  //     },
+  //     {
+  //       path: 'add',
+  //       name: 'StoreOutAdd',
+  //       component: () => import('@view/wms/store_out/storeOutAdd/index'),
+  //       meta: { title: '添加出仓',activeMenu:'/wms/store_out/StoreOutAdd/index' }
+  //     },
+  //     {
+  //       path: 'edit',
+  //       name: 'StoreOutEdit',
+  //       component: () => import('@view/wms/store_out/storeOutEdit/index'),
+  //       meta: { title: '编辑出仓',activeMenu:'/wms/store_out/StoreOutEdit/index' }
+  //     },
+  //   ]
+  // },
 
 ]
 

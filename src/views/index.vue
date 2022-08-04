@@ -302,9 +302,14 @@
           <el-row>
             <el-col :span="10" :xl="2" :lg="3" :md="4" :sm="5" :xs="6">
               <el-form-item>
-                <el-popover trigger="click" content="气泡" disabled>
-                  <span>利用分发取代content信息</span>
-                  <el-button slot="reference">点击气泡</el-button>
+                <el-popover
+                  placement="bottom"
+                  title="标题"
+                  width="200"
+                  trigger="click"
+                  content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
+                >
+                  <el-button slot="reference">click 激活1</el-button>
                 </el-popover>
               </el-form-item>
             </el-col>
@@ -312,8 +317,7 @@
               <el-form-item>
                 <el-popover trigger="hover" content="气泡">
                   <span>利用分发取代content信息</span>
-                  <span>利用分发取代content信息</span>
-                  <el-button slot="reference">悬停气泡</el-button>
+                  <el-button slot="reference">悬停气泡1</el-button>
                 </el-popover>
               </el-form-item>
             </el-col>
@@ -369,6 +373,14 @@
 
         </el-form>
       </el-row>
+      <el-row>
+        <el-date-picker
+          v-model="datePicker"
+          type="date"
+          placeholder="选择日期"
+          prefix-icon=""
+        />
+      </el-row>
     </div>
   </div>
 </template>
@@ -376,10 +388,12 @@
 <script>
 // 来首页玩一下mappingField
 import { categoryDropdown } from '@api/wms/category'
+
 export default {
   name: 'Index',
   data() {
     return {
+      datePicker: '',
       provinceOpt: [],
       cityOpt: [],
       areaOpt: [],

@@ -1,13 +1,31 @@
 import { getYarn,getTech,getPurpose,getProcess,getOrigin,getBleach,getPositionsOptions } from "../data"
-
+//formRules的结构如下
+/**
+ * {
+ *  customerName:[
+ *    {},
+ *    {}
+ *  ]
+ * }
+ *
+ */
 export const formLabel = [
   {
     key: 'customerName',//!khmc
     label: '客户',
     inputType: 3,
-    rule:{
-      required: true, message: '客户不能为空', trigger: 'blur'
-    }
+    // rule:{
+    //   required: true, message: '客户不能为空', trigger: 'blur'
+    // },
+    rule(formData){
+      return [
+        {required: true, message: '客户不能为空', trigger: 'blur'},
+        {validator(rule,value,callback){
+          console.log(rule,value);
+          callback()
+        }}
+      ]
+    },
   },
   {
     key: 'warehouse',//!spckmc
@@ -15,21 +33,21 @@ export const formLabel = [
     inputType: 3,
     rule:{
       required: true, message: '仓库不能为空', trigger: 'blur'
-    }
+    },
   },
   {
     key: 'stevedorage',//!iszxf
     label: '装卸费',
     inputType:4,
     activeValue:`0`,
-    inactiveValue:`1`
+    inactiveValue:`1`,
   },
   {
     key: 'workingOut',//!iszyl
     label: '作业量',
     inputType:4,
     activeValue:`0`,
-    inactiveValue:`1`
+    inactiveValue:`1`,
   },
   {
     key: 'plateNumber',//!dzzy6
@@ -38,7 +56,7 @@ export const formLabel = [
     rule:[
       { required: true, message: '车牌不能为空', trigger: 'blur' },
       // { pattern:/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领][A-HJ-NP-Z][A-HJ-NP-Z0-9]{4,5}[A-HJ-NP-Z0-9挂学警港澳]$/, message: '请输入正确的车牌号', trigger: 'blur' },
-    ]
+    ],
   },
   {
     key: 'linkman',//!dzzy7
@@ -95,28 +113,26 @@ export const formLabel = [
 
 export const tableColumns = [
   {
-    key: 'receiptDate',//!ssrqid
+    key: 'date',//!ssrqid
     label: '入仓日期',
-    align: 'center',
     fixed: false,
     inputType: 2,
     valueFormat:'yyyy-MM-dd',
     renderGroup: '基本货物信息',
     columnOrder:99,
     labelOrder:1000,
-    // labelVisible:false,
-    // columnVisible:false,
-    error:true,
+    error:'haha',
+    width:'100px',
     rule:{
       required: true, message: '入仓日期不能为空', trigger: 'change'
     },
+    error:'接口校验'
   },
   {
     key: 'specification',//!spzs
     label: '物品规格',
-    align: 'left',
     fixed: false,
-    width: '200px',
+    width: '150px',
     inputType: 0,
     columnOrder:93,
     labelOrder:990,
@@ -129,7 +145,6 @@ export const tableColumns = [
    {
     key: '$batchNo',//!spbh
     label: '批号',
-    align: 'left',
     fixed: false,
     inputType: 0,
     columnOrder:95,
@@ -142,7 +157,6 @@ export const tableColumns = [
   {
     key: '$shipNo',//!spgh
     label: '柜号',
-    align: 'left',
     fixed: false,
     inputType: 0,
     columnOrder:94,
@@ -155,7 +169,6 @@ export const tableColumns = [
    {
     key: 'number',//!spjs
     label: '件数',
-    align: 'left',
     fixed: false,
     inputType: 0,
     // filter(val){
@@ -172,9 +185,7 @@ export const tableColumns = [
   {
     key: 'pieceWeight',//!spjsl
     label: '单重',
-    align: 'left',
     fixed: false,
-    width: '180px',
     inputType: 0,
     unit:'kg',
     columnOrder:96,
@@ -183,6 +194,7 @@ export const tableColumns = [
     //   if(!Number(val)) return
     //   return Math.round(val * 100) / 100
     // },
+    width:'120px',
     renderGroup: '基本货物信息',
     rule:[
       { required: true, message: '单重不能为空', trigger: 'blur'},
@@ -192,7 +204,6 @@ export const tableColumns = [
   {
     key: '$positionId',//spcwid
     label: '仓位',
-    align: 'left',
     fixed: false,
     inputType: 1,
     columnOrder:92,
@@ -206,9 +217,7 @@ export const tableColumns = [
   {
     key: 'totalWeight',//!spsl
     label: '重量',
-    align: 'left',
     fixed: false,
-    width: '180px',
     inputType: 0,
     disabled:true,
     columnOrder:97,
@@ -217,6 +226,7 @@ export const tableColumns = [
       const val = Number(formData.pieceWeight || 0) * Number(formData.number || 0) / 1000
       return Object.is(val,NaN) ? 0 : val.toFixed(4)
     },
+    width:'120px',
     unit:'吨',
     // labelWidth:'200px',
     renderGroup: '基本货物信息',
@@ -227,7 +237,6 @@ export const tableColumns = [
   {
     key: 'brand',//!spcd
     label: '品牌',
-    align: 'left',
     fixed: false,
     inputType: 0,
     columnOrder:91,
@@ -240,7 +249,6 @@ export const tableColumns = [
   {
     key: 'yarn',//!wpggA
     label: '纱支',
-    align: 'left',
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
@@ -253,7 +261,6 @@ export const tableColumns = [
   {
     key: 'tech',//!wpggB
     label: '工艺',
-    align: 'left',
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
@@ -263,7 +270,6 @@ export const tableColumns = [
   {
     key: 'process',//!wpggC
     label: '工序',
-    align: 'left',
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
@@ -273,7 +279,6 @@ export const tableColumns = [
   {
     key: 'purpose',//!wpggD
     label: '用途',
-    align: 'left',
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
@@ -283,7 +288,6 @@ export const tableColumns = [
   {
     key: 'origin',//!wpggE
     label: '产地',
-    align: 'left',
     fixed: false,
     inputType: 1,
     renderGroup: '高级货物信息',
@@ -293,7 +297,6 @@ export const tableColumns = [
   {
     key: 'bleach',//wpggF
     label: '漂染性',
-    align: 'left',
     fixed: false,
     inputType: 0,
     renderGroup: '高级货物信息',
@@ -306,7 +309,6 @@ export const tableColumns = [
   {
     key: 'manufactureDate',//!wpggG
     label: '生产日期',
-    align: 'center',
     fixed: false,
     inputType: 2,
     valueFormat:'yyyy-MM-dd',
@@ -319,7 +321,6 @@ export const tableColumns = [
   {
     key: 'color',//!wpggH
     label: '颜色',
-    align: 'left',
     fixed: false,
     inputType: 0,
     columnVisible:false,
@@ -331,7 +332,6 @@ export const tableColumns = [
   {
     key: 'skuRemark',//!itbz
     label: '备注',
-    align: 'left',
     fixed: false,
     width: '200px',
     inputType: 0,

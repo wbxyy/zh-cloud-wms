@@ -1,5 +1,5 @@
 // storeInList=>/storage/hwrc/list
-const sampleStoreInList = {
+export const sampleStoreInList = {
   request: {
     'ckcw': '',
     'dzzy6': '',
@@ -57,7 +57,7 @@ const sampleStoreInList = {
 }
 
 // storeInDelete=>/storage/hwrc/del
-const sampleStoreInDelete = {
+export const sampleStoreInDelete = {
   request: {
     'dzid': 0,
     'prrq': '',
@@ -69,7 +69,7 @@ const sampleStoreInDelete = {
 }
 
 // storeIn=>/storage/hwrc/detail/${dzid}/${shztn}
-const sampleStoreIn = {
+export const sampleStoreIn = {
   request: {
 
   },
@@ -113,7 +113,7 @@ const sampleStoreIn = {
 }
 
 // storeInUpdate=>/storage/hwrc/modifyInfo
-const sampleStoreInUpdate = {
+export const sampleStoreInUpdate = {
   request: {
     'dzbz': '',
     'dzid': '',
@@ -128,7 +128,7 @@ const sampleStoreInUpdate = {
 }
 
 // storeInUpdateDetail=>/storage/hwrc/modify
-const sampleStoreInUpdateDetail = {
+export const sampleStoreInUpdateDetail = {
   request: {
     'dzid': 0,
     'itbz': '',
@@ -165,7 +165,7 @@ const sampleStoreInUpdateDetail = {
 }
 
 // warehousePositions=>/storage/category/selectPosition/${warehouseId}
-const sampleWarehousePositions = {
+export const sampleWarehousePositions = {
   response: [
     {
       'ckcw': 'DTS',
@@ -176,7 +176,7 @@ const sampleWarehousePositions = {
 }
 
 // storeInCreate=>/storage/hwrc/add
-const sampleStoreInCreate = {
+export const sampleStoreInCreate = {
   request: {
     'dzbz': '',
     'dzid': 0,
@@ -220,7 +220,7 @@ const sampleStoreInCreate = {
 }
 
 // warehouseList=>/storage/zdspck/selectWarehouse1
-const sampleWarehouseList = {
+export const sampleWarehouseList = {
   request: {
     'isBa': '',
     'khmcid': '',
@@ -243,7 +243,7 @@ const sampleWarehouseList = {
 }
 
 // customerList=>/storage/shop/selectCustomer
-const sampleCustomerList = {
+export const sampleCustomerList = {
   request: {
     'all': '',
     'isBa': '',
@@ -274,7 +274,7 @@ const sampleCustomerList = {
   ]
 }
 
-const sampleStoreInAudit = {
+export const sampleStoreInAudit = {
   request: [
     {
       'dzid': 0,
@@ -289,20 +289,6 @@ const sampleStoreInAudit = {
   ]
 }
 
-const sampleStoreInReject = {
+export const sampleStoreInReject = {
 
-}
-
-export {
-  sampleStoreInList,
-  sampleStoreInDelete,
-  sampleStoreIn,
-  sampleStoreInUpdate,
-  sampleStoreInUpdateDetail,
-  sampleWarehousePositions,
-  sampleStoreInCreate,
-  sampleWarehouseList,
-  sampleCustomerList,
-  sampleStoreInAudit,
-  sampleStoreInReject
 }

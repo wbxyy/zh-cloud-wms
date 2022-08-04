@@ -1,8 +1,8 @@
 <template>
   <el-select  v-bind="$attrs" v-model="model" v-on="$listeners">
     <el-option
-      v-for="option in options"
-      :key="option.value"
+      v-for="(option,index) in options"
+      :key="index"
       :label="option.label"
       :value="option" >
     </el-option>

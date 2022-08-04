@@ -189,3 +189,32 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+
+.error{
+  font-weight: 700;
+  position:relative;
+  &::before{
+    z-index:9999;
+    content:'bug';
+    color: #fff;
+    font-size: 12px;
+    line-height: 12px;
+    position:absolute;
+    padding: 12px;
+    background-color: rgba(255,0,0);
+    transform: rotate(45deg);
+  }
+  &:hover::before{
+    background-color: transparent;
+    color: transparent;
+  }
+}
+
+
+//箭头颜色
+::v-deep .el-tooltip__popper[x-placement^=bottom] .popper__arrow::after {
+   border-bottom-color: red;
+}
+::v-deep .el-tooltip__popper[x-placement^=bottom] .popper__arrow{
+    border-bottom-color: red;
+}

@@ -45,12 +45,13 @@ export default {
     },
   },
   created() {
-    // 显隐列初始默认隐藏列
-    for (let item in this.columns) {
-      if (this.columns[item].visible === false) {
-        this.value.push(parseInt(item));
+    // 初始化transform目标列表(右边列表)
+    if(!this.columns) return
+    this.columns.forEach((item)=>{
+      if(item.columnVisible===false){
+        this.value.push(item.key)
       }
-    }
+    })
   },
   methods: {
     // 搜索
@@ -61,12 +62,16 @@ export default {
     refresh() {
       this.$emit("queryTable");
     },
-    // 右侧列表元素变化
+    // 右侧列表元素变化(data是右侧列表)
     dataChange(data) {
-      for (let item in this.columns) {
-        const key = this.columns[item].key;
-        this.columns[item].visible = !data.includes(key);
-      }
+      this.columns.forEach(item=>{
+        const isShow = !data.includes(item.key)
+        if(item.hasOwnProperty('visible')){
+          item.visible = isShow
+        }else{
+          this.$set(item,'visible',isShow)
+        }
+      })
     },
     // 打开显隐列dialog
     showColumn() {

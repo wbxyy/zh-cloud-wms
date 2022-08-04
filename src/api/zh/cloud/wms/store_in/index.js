@@ -63,7 +63,7 @@ export function storeInList({ data, params }) {
   })
 }
 
-// ?删除入仓单
+// ?删除入仓单sku
 export function storeInDelete(data) {
   return request({
     url: '/storage/hwrc/del',
@@ -73,7 +73,7 @@ export function storeInDelete(data) {
   })
 }
 
-// ?获取入仓单详情
+// ?获取入仓单sku详情
 export function storeIn(dzid) {
   const shztn = 0
   return request({
@@ -83,7 +83,7 @@ export function storeIn(dzid) {
   })
 }
 
-// ? 入仓单修改(外围)
+// ? 入仓单修改
 export function storeInUpdate(data) {
   return request({
     url: `/storage/hwrc/modifyInfo`,
@@ -93,7 +93,7 @@ export function storeInUpdate(data) {
   })
 }
 
-// ?入仓单修改（明细）
+// ?入仓单修改（sku）
 export function storeInUpdateDetail(data) {
   return request({
     url: `/storage/hwrc/modify`,

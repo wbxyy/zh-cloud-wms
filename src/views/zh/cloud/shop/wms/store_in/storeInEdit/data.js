@@ -65,9 +65,10 @@ export const tableColumns = [
     key: 'customerName',//!spkhmc
     label: '客户',
     align: 'left',
-    width:'320px',
+    width:'240px',
     fixed: false,
     columnOrder:1000,
+    labelOrder:1000,
     renderGroup: '概要',
   },
   {
@@ -93,7 +94,6 @@ export const tableColumns = [
     label: '备注',
     align: 'left',
     fixed: false,
-
     width: '200px',
     inputType: 0,
     renderGroup: '概要',
@@ -106,7 +106,7 @@ export const tableColumns = [
     columnOrder:960,
     inputType: 0,
     filter(val){
-      return Number(val).toFixed(2)
+      return Math.round(Number(val||0)*100)/100
     },
     renderGroup: '基本货物信息',
     rule:[
@@ -122,7 +122,7 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     columnOrder:950,
-    width: '180px',
+    width: '120px',
     inputType: 0,
     computed(formData){
       const val = Number(formData.pieceWeight || 0) * Number(formData.number || 0) / 1000
@@ -139,7 +139,7 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     columnOrder:990,
-    width: '180px',
+    width: '100px',
     inputType: 1,
     // options:getWarehouseOptions(),
     options:{
@@ -153,9 +153,8 @@ export const tableColumns = [
     },
   },
    {
-    key: 'receiptDate',//!ssrqid
+    key: 'date',//!ssrqid
     label: '入仓日期',
-    align: 'center',
     fixed: false,
     columnOrder:1010,
     inputType: 2,
@@ -171,7 +170,7 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     columnOrder:920,
-    width: '200px',
+    width: '150px',
     inputType: 0,
     renderGroup: '基本货物信息',
     rule:{
@@ -185,7 +184,7 @@ export const tableColumns = [
     fixed: false,
     columnOrder:940,
     inputType: 0,
-    width: '200px',
+    width: '100px',
     renderGroup: '基本货物信息',
     rule:{
       required: true, message: '批号不能为空', trigger: 'blur'
@@ -199,11 +198,8 @@ export const tableColumns = [
     fixed: false,
     columnOrder:930,
     inputType: 0,
-    width: '200px',
+    width: '100px',
     renderGroup: '基本货物信息',
-    // rule:{
-    //   required: true, message: '柜号可以为空', trigger: 'blur'
-    // }
   },
   {
     key: 'brand',//!spcd
@@ -224,7 +220,7 @@ export const tableColumns = [
     inputType: 0,
     unit:'kg',
     filter(val){
-      return Number(val).toFixed(2)
+      return Math.round(Number(val||0)*100)/100
     },
     renderGroup: '基本货物信息',
     rule:[
@@ -254,13 +250,24 @@ export const tableColumns = [
     },
   },
   {
-    key: '$skuId',
-    label: '条码',
+    key: '$skuNo',
+    label: '客户条码',
     align: 'left',
     fixed: false,
-    width:'180px',
+    width:'100px',
     columnOrder:880,
-    renderGroup: '基本货物信息',
+    labelOrder:990,
+    renderGroup: '概要',
+  },
+  {
+    key: '$warehouseNo',
+    label: '仓库条码',
+    align: 'left',
+    fixed: false,
+    width:'100px',
+    columnVisible:false,
+    labelOrder:989,
+    renderGroup: '概要',
   },
    //!拆分件数
   {
@@ -292,7 +299,6 @@ export const tableColumns = [
   {
     key: 'splitDate',//!ssrqid3
     label: '拆分入仓日期',
-    align: 'center',
     fixed: false,
     columnVisible:false,
     inputType: 2,
@@ -301,7 +307,6 @@ export const tableColumns = [
   {
     key: '$splitPositionId',
     label: '新仓位',
-    align: 'center',
     columnVisible:false,
     fixed: false,
     inputType: 1,
@@ -385,7 +390,6 @@ export const tableColumns = [
   {
     key: 'manufactureDate',//!wpggG
     label: '生产日期',
-    align: 'center',
     fixed: false,
     columnVisible:false,
     inputType: 2,

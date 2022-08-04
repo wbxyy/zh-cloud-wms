@@ -1,6 +1,6 @@
 <template>
 <div>
-  <!-- 表单对话框 -->
+  <!-- 表单对话框 start-->
   <el-dialog
     :title="dialogTitle"
     :visible.sync="dialogVisible"
@@ -19,13 +19,10 @@
     </el-select>
     <SugarForm ref="SugarForm" :form-label="tableColumns" :form-data="row" :form-col="formCol" size="small"></SugarForm>
   </el-dialog>
+  <!-- 表单对话框 end-->
 
-  <!-- 表格 -->
-  <el-card class="little-margin-top" shadow="never">
-    <div v-show="editMode" class="card-padding card-title">
-      <el-button type="info" @click="editInline?handleAddRowInline():handleAddRow()">{{ editInline?"添加编辑行":"进入表单录入" }}</el-button>
-    </div>
 
+  <!-- 表格start -->
     <!-- 用来提示校验的气泡 -->
     <el-popover trigger="manual" :value="Boolean(err)" placement="top">
       <!-- 表单域，校验域是一行 -->
@@ -40,7 +37,6 @@
           </template>
           <template slot-scope="scope">
             <el-button
-              v-show="!editInline"
               size="mini"
               type="text"
               icon="el-icon-edit"
@@ -55,29 +51,23 @@
           </template>
         </el-table-column>
         <el-table-column v-for="(item) in filterColumns" :key="item.key" :label="item.label" :align="item.align" :prop="item.key" :width="item.width?item.width:defaultWidth(item)" :fixed="item.fixed" :header-align="item.headerAlign?item.headerAlign:'center'" >
+          <template slot="header" slot-scope="scope">
+            <div v-tooltip="item.message" v-tooltip:error="item.error">{{item.label}}</div>
+          </template>
           <template slot-scope="scope">
-            <div v-show="editInline && currentRow===scope.$index" >
-              <el-form-item :prop="item.key" >
-                <SugarTypeIn :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index]" ></SugarTypeIn>
-              </el-form-Item>
-            </div>
-            <div v-show="!(editInline && currentRow===scope.$index)">
-              <span v-if="item.align==='center'">{{ scope.row[item.key] }}</span>
-              <span v-else-if="item.inputType === 1">
-                {{getLabel(scope.$index,item.key)}}
-              </span>
-              <span v-else style="padding-left:15px;padding-right:20px;display:flex;justify-content:space-between;">
-                  <span>{{tableData[scope.$index][item.key]}}</span>
-                  <span>{{item.unit}}</span>
-              </span>
-            </div>
+            <el-form-item :prop="item.key" v-if="currentRow===scope.$index">
+              <SugarTypeIn :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index]" ></SugarTypeIn>
+            </el-form-Item>
+            <SugarTypeIn v-else :short-holder='true' :no-label="true" :form-item="item" :value="tableData[scope.$index]" ></SugarTypeIn>
+
           </template>
         </el-table-column>
       </el-table>
       </el-form>
       <span style="color:red">{{err}}</span>
     </el-popover>
-  </el-card>
+  <!-- 表格end -->
+
 </div>
 </template>
 
@@ -96,10 +86,6 @@ export default {
   props:{
     tableData:Array,
     tableColumns:Array,
-    editMode:{
-      type:Boolean,
-      default:true
-    },
     size:{
       type:String,
       default:'medium'
@@ -119,7 +105,7 @@ export default {
             //没有打上标记的数据，先执行filter再打上标记(数据流是循环的，filter只在初始化数据时生效)
             //!执行filter的位置
             for(const key in item){
-              const col = this.tableColumns.find(col => col.key === key)
+              const col = this.filterColumns.find(col => col.key === key)
               if (_.get(col, 'filter')) {
                 item[key] = col.filter(item[key])
               }
@@ -132,7 +118,14 @@ export default {
   },
   computed:{
     rules(){
-      const entries = this.tableColumns.map(item=>[item.key,item.rule])
+      const entries = this.filterColumns.map(item=>{
+        let rule = item.rule
+        //! 支持函数形式的rule，传递整个表单值
+        if(typeof item.rule === 'function'){
+          rule = item.rule(_.get(this.tableData,this.currentRow))
+        }
+        return [item.key,rule]
+      })
       return Object.fromEntries(entries)
     },
     filterColumns(){
@@ -151,7 +144,7 @@ export default {
       // 弹窗表单的标题
       dialogTitle:'',
       // 切换明细输入方式
-      editInline:false,
+      editInline:true,
       // 聚焦的行
       currentRow:0,
       row:null,
@@ -159,12 +152,15 @@ export default {
     }
   },
   created(){
-    const entries = this.tableColumns.map(item=>{
+    const entries = this.filterColumns.map(item=>{
       return [item.key,undefined]
     })
-    row =  Object.fromEntries(entries)
+    row = Object.fromEntries(entries)
   },
   methods:{
+    add(){
+      this.editInline ? this.handleAddRowInline() : this.handleAddRow()
+    },
     tableUpdate(){
       //?将popover放在el-table，要记得删掉多余fixed图层
       // //清除自定义校验信息
@@ -214,6 +210,7 @@ export default {
       this.$refs.SugarForm.validate().then(valid=>{
         if(valid){
           this.dialogVisible = false
+          this.clearValidate()
           if (this.tableData.filter(item => item.$sugarRowId === this.row.$sugarRowId).length > 0) {
             // 编辑逻辑
             this.$modal.msg('你编辑了一个条码')
@@ -254,6 +251,7 @@ export default {
           this.$modal.alert(msg)
           throw msg
         }
+        this.clearValidate()
         return value
       }).catch(err=>{
         this.editInline = true
@@ -267,22 +265,49 @@ export default {
     defaultWidth(item){
       let width = 0
       switch(item.inputType){
-        case 0:width='120px'; break
-        case 1:width='150px'; break
-        case 2:width='160px'; break
+        case 0:width='100px'; break
+        case 1:width='100px'; break
+        case 2:width='100px'; break
         case 3:width=undefined; break
         case 4:width=undefined; break
       }
       return width
     },
-    getLabel(index,key){
-      return _.get(this.tableData,`[${index}][${key}].label`)
+    clearValidate(){
+      // this.$refs.SugarForm.clearValidate()
+      // this.$refs.form.clearValidate()
+      this.err=''
     }
+
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@style/sugar.scss';
+
+::v-deep .el-table{
+  .el-input__inner{
+    padding:0;
+    padding-left: 5px;
+  }
+
+  .el-table__cell .cell{
+    padding:0;
+    padding-left:5px;
+    padding-right:5px;
+  }
+
+  .el-input-group__append{
+    padding:0;
+    padding-left:2px;
+    padding-right:2px;
+  }
+
+  //table内的日期选择器隐藏前置图标
+  .el-date-editor .el-input__prefix{
+    display:none;
+  }
+}
 
 </style>

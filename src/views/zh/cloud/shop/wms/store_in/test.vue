@@ -1,7 +1,5 @@
 <template>
   <div class="app-container">
-    <div class="box" />
-    <div id="sticky" class="el-table el-table--fit el-table--border el-table--scrollable-x el-table--mini" />
 
     <el-row :gutter="15">
       <el-form v-show="showSearch" ref="queryForm" :model="queryParams" size="small" label-width="80px">
@@ -235,9 +233,8 @@
 <script>
 import SugarToolTip from '@/components/SugarToolTip'
 import SugarScrollBar from '@/components/SugarScrollBar'
-import axios from 'axios'
+import { storeInList as getData } from '@api/wms/store_in'
 import { tableColumns } from './data.js'
-axios.defaults.baseURL = '/mock_api'
 export default {
   name: 'StoreIn',
   components: {
@@ -343,11 +340,11 @@ export default {
       //   this.total = response.total
       //   this.loading = false
       // })
-      axios({
+      getData({
         url: '/wms/store_in'
-      }).then(({ data }) => {
-        this.storeInList = data.data
-        this.total = data.total
+      }).then(res => {
+        this.storeInList = res.data
+        this.total = res.total
         this.loading = false
       })
     },

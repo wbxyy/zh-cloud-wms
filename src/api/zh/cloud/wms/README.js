@@ -44,7 +44,7 @@
 // todo 创建人 creator <==> rsopmc
 // todo 创建时间 createDate <==> prrq
 // todo 审核日期 verifyDate <==> SHrqid
-// todo 入仓日期 receiptDate <==>  ssrqid，rqid1,rqid2
+// todo 入仓日期 date <==>  ssrqid，rqid1,rqid2
 // todo 物品规格 specification <==> spzs
 // todo 批号 $batchNo <==> spbh
 // todo 柜号 $shipNo <==> spgh
@@ -67,7 +67,7 @@
 // todo 关联单号 $relativeNo <==> pzbh1,yydh
 // todo 外部单号 $outerNo <==> wbdh
 // todo 客户名 customerName <==> khmc
-// todo 入仓日期 receiptDate <==>  ssrqid，rqid1,rqid2
+// todo 入仓日期 date <==>  ssrqid，rqid1,rqid2
 // todo 起始日期 <==> rqid1
 // todo 结束日期 <==> rqid2
 // todo 条码 $skuNo <==> sptm

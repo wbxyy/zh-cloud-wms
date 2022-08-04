@@ -49,12 +49,12 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          v-tooltip:error="'审核100条数据请求超时'"
           type="warning"
           plain
           icon="el-icon-check"
           size="mini"
           :disabled="multiple"
-          class="error"
           @click="handleAudit"
         >审核</el-button>
       </el-col>
@@ -65,6 +65,7 @@
       ref="sugarTable"
       :data="list"
       :loading="loading"
+      :table-columns="displayColumns"
       size="medium"
       border
       @header-click="handleHeaderClick"
@@ -92,14 +93,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-for="item in displayColumns" :key="item.id" :label="item.label" :align="item.align" :prop="item.prop" :width="item.width" :tip="item.itp" :fixed="item.fixed" />
+      <el-table-column v-for="item in displayColumns" :key="item.id" :label="item.label" :align="item.align" :prop="item.key" :width="item.width" :fixed="item.fixed" />
 
     </SugarTable>
 
     <pagination
       v-show="total>0"
       :total="total"
-      :page-sizes="[100, 200, 300, 400]"
+      :page-sizes="[20, 200, 300, 400]"
       :page.sync="pageNum"
       :limit.sync="pageSize"
       @pagination="getList"
@@ -109,11 +110,11 @@
 </template>
 
 <script>
+import { buildXlsx } from '@/utils/xlsx'
 import SugarTable from '@/components/SugarTable'
 import SugarForm from '@/components/SugarForm'
 import { tableColumns, formLabel } from './data.js'
 import { storeInList, storeInAudit } from '@/api/zh/cloud/wms/store_in'
-import _ from 'lodash'
 export default {
   name: 'StoreIn',
   components: {
@@ -182,7 +183,7 @@ export default {
   },
   computed: {
     displayColumns() {
-      return this.tableColumns.filter(item => item.visible)
+      return this.tableColumns.filter(item => item.visible ?? true)
     }
   },
   watch: {
@@ -226,6 +227,8 @@ export default {
         this.list = res.rows
         this.total = res.total
         this.loading = false
+        this.queryParams.startDate = null
+        this.queryParams.endDate = null
       })
     },
     /** 搜索按钮操作 */
@@ -258,7 +261,20 @@ export default {
     // },
     /** 导出按钮操作 */
     handleExport() {
-      // this.$modal.msg('导出功能')
+      // 拿到表头
+      if (!this.ids.length) {
+        return this.$modal.msgWarning('请勾选导出的数据')
+      }
+      // 导出数据要和表格一致
+      const data = this.list.filter(f => this.ids.includes(f.$billId)).map(item => this.displayColumns.map(column => item[column.key]))
+
+      data.unshift(this.displayColumns.map(m => m.label))
+
+      buildXlsx([{ name: '入仓单列表', data: data }], '入仓单导出').then(res => {
+        this.$modal.msgSuccess('导出成功')
+      }).catch(err => {
+        this.$modal.msgSuccess('导出失败', err)
+      })
     },
     // summary({ data }) {
     //   console.log('summary')
