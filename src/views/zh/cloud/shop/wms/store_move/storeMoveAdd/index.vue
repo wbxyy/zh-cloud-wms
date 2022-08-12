@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
-    <!-- 标题start -->
-    <el-card shadow="never">
+
+    <el-card shadow="never" class="mb10">
       <div class="card-title card-padding">
         <div class="card-info">
           <i class="el-icon-tickets" />
@@ -17,75 +17,66 @@
         </div>
       </div>
     </el-card>
-    <!-- 标题end -->
 
-    <!-- 表单start -->
+    <el-row :gutter="10" class="mb10">
+      <el-col :span="1.5">
+        <el-button @click="dialogCustomer = true">选择客户和仓库</el-button>
+      </el-col>
+    </el-row>
+
     <SugarForm
       ref="SugarForm"
-      class="little-margin-top filter-container"
+      class="filter-container"
       :form-label="formLabel"
-      :form-data="formData"
+      :form-data.sync="formData"
       :form-col="formCol"
-      :method-obj="methodObj"
     >
       <div class="fr filter-item">
         <el-button @click="handleReset">重置</el-button>
       </div>
     </SugarForm>
-    <!-- 表单end -->
 
-    <!-- 表格start -->
+    <!-- 批量选择仓位start -->
+    <el-row :gutter="10" class="mb10">
+      <el-col :span="1.5">
+        <el-button v-show="submitData.$warehouseId_n" @click="dialogStockShow">选择库存</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button v-show="list.length>0" @click="dialogPositionShow">批量选新仓位</el-button>
+      </el-col>
+    </el-row>
+
     <SugarEditTable
       ref="SugarEditTable"
-      :table-data="list"
+      class="mb10"
+      :table-data.sync="list"
       :table-columns="tableColumns"
     />
-    <!-- 表格end -->
 
-    <!-- footer_start -->
-    <div class="footer little-margin-top">
+    <div class="footer mb10">
       <el-button size="medium" type="warning" @click="handleSubmit">提交调仓单</el-button>
     </div>
-    <!-- footer_end -->
 
-    <!--录入客户和仓库start -->
     <CustomerDialog :visible.sync="dialogCustomer" @selectCustomer="handleSelectCustomer" />
-    <!-- 录入客户和仓库end -->
 
-    <!-- 录入仓位start -->
     <PositionDialog :visible.sync="dialogPosition" :params="positionParams" @selectPosition="handleSelectPosition" />
-    <!-- 录入仓位end -->
 
-    <!-- 录入库存start -->
-    <StockDialog :visible.sync="dialogStock" :params="stockParams" @selectStock="handleSelectStock" @confirmStock="confirmStock" />
-    <!-- 录入库存end -->
+    <StockDialog :visible.sync="dialogStock" :params="stockParams" @confirmStock="confirmStock" />
 
   </div>
 </template>
 
 <script>
 import { formLabel, tableColumns } from './data'
-import { storeOutCreate } from '@api/wms/store_out'
+import { storeMoveCreate } from '@api/wms/store_move'
+import { positionsStoreInOptions } from '@api/wms/preFetch'
 import SugarForm from '@/components/SugarForm'
 import SugarEditTable from '@/components/SugarEditTable'
 import CustomerDialog from './components/CustomerDialog'
 import PositionDialog from './components/PositionDialog'
 import StockDialog from './components/StockDialog'
 import _ from 'lodash'
-const formData = {
-  btnCustomerWarehouse: null, // 按钮
-  customerName: null, //! 客户名#
-  warehouse: null,
-  $warehouseId: null,
-  position: null,
-  $positionId: null,
-  $newPositionId: null,
-  $customerId: null, //! 客户id
-  stock: null, //! 库存
-  movingType: null, //! 调仓类型
-  billRemark: null, //! 单证备注✔#
-  list: []//! 入仓条码明细
-}
+
 export default {
   name: 'StoreMoveAdd',
   components: {
@@ -103,83 +94,103 @@ export default {
       loading: true,
       // 明细
       list: [],
-      formData: Object.assign({}, formData),
+      formData: {},
       formLabel: formLabel,
       tableColumns: tableColumns,
       dialogCustomer: false,
       dialogPosition: false,
       dialogStock: false,
       stockParams: null,
-      positionParams: null
-    }
-  },
-  computed: {
-    // SugarForm方法映射
-    methodObj() {
-      return {
-        customerName: {
-          click: this.customerSelect
-        },
-        position: {
-          click: this.positionSelect
-        },
-        stock: {
-          click: this.stockSelect
-        }
-      }
+      positionParams: null,
+      submitData: {}
     }
   },
   methods: {
     //! 对话框发射回来的事件
     handleSelectCustomer(row) {
+      // 需要在customer中拿到哪些数据呢
+
+      // khmc 客户名 对应row的khmc
+      // khmcid 客户id 对应row的khid
+      // spckidn 新仓库id  对应 row 的 spckid
+      // spcwidn 仓位id 不用填
+      // dzbz 备注 formData里的
+      // dzrb 选项 formData里的
+      // khlk 商城 对应row的shop
+
       this.dialogCustomer = false
-      const { customerName, $customerId, warehouse, $warehouseId } = row
-      Object.assign(this.formData, { customerName, $customerId, warehouse, $warehouseId })
+
+      this.submitData.customerName = row.customerName
+      this.submitData.$customerId = row.$customerId
+      this.submitData.$warehouseId_n = row.$warehouseId
+      this.submitData.shop = row.shop
+
+      // 从客户对话框拿到客户名，客户ID，仓库名，仓库Id，shop
+      const { customerName, warehouse } = row
+      // 赋值给表单
+      Object.assign(this.formData, { customerName, warehouse })
+      // 清空列表
+      this.$refs.SugarEditTable.init([])
+      // 仓位下拉选项
+      this.tableColumns.find(item => item.key === '$positionId_2').options = positionsStoreInOptions(row.$warehouseId)
     },
+    //! 对话框发射回来的事件(批量选仓位)
     handleSelectPosition(row) {
       this.dialogPosition = false
-      const { position, $positionId } = row
-      Object.assign(this.formData, { position, $positionId, $newPositionId: $positionId })
-    },
+      // 从仓位对话框拿到仓位，仓位ID
+      this.submitData.$positionId_n = row.$positionId
 
-    handleSelectStock(data) {
-      // 将选中的数据赋值给list
-      this.list = data
+      // 重新设置list中的仓位
+      this.list.forEach(item => {
+        item.$movePositionId = {
+          label: row.position,
+          value: row.$positionId
+        }
+      })
     },
-    //! 按钮事件
-    customerSelect() {
-      this.dialogCustomer = true
-    },
-    positionSelect() {
+    dialogPositionShow() {
       // 设置仓位的param
       this.dialogPosition = true
-      this.positionParams = Object.assign({}, this.formData)
+      this.positionParams = {
+        $warehouseId: this.submitData.$warehouseId_n
+      }
     },
-    stockSelect() {
+    dialogStockShow() {
       this.dialogStock = true
-      this.stockParams = Object.assign({}, this.formData)
+      this.stockParams = {
+        $warehouseId: this.submitData.$warehouseId_n
+      }
+      this.$set(this.stockParams, 'list', _.cloneDeep(this.list))
     },
     confirmStock(data) {
       this.dialogStock = false
       this.dialogCustomer = false
-      this.list = this.list.concat(data)
+      this.$refs.SugarEditTable.init(this.list.concat(data))
     },
     handleSubmit() {
       Promise.all([this.$refs.SugarForm.validate(), this.$refs.SugarEditTable.validate()]).then(values => {
         if (values.every(truly => truly)) {
-          this.formData.list = this.list
-          return storeOutCreate(this.formData)
+          const data = {
+            list: this.list,
+            ...this.submitData,
+            ...this.formData
+          }
+          this.$modal.loading('正在添加调仓...')
+          return storeMoveCreate(data)
         }
       }).then(res => {
-        if (!res) return this.$modal.alert('添加出仓单失败，联系....')
-        this.$modal.alert('添加出仓单成功')
+        if (!res) return this.$modal.alert('添加调仓单失败，联系....')
+        this.$modal.alert('添加调仓单成功')
         // ?清空表单
       }).catch(err => {
-        console.error('坐标：提交出仓单', err)
+        console.error('坐标：提交调仓单', err)
+      }).finally(res => {
+        this.$modal.closeLoading()
+        return res
       })
     },
     handleReset() {
-      this.formData = Object.assign({}, formData)
+      this.$refs.SugarForm.resetFields()
     }
   }
 }

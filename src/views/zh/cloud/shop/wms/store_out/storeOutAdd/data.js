@@ -5,8 +5,13 @@ export const formLabel = [
     key: 'customerName',//!khmc
     label: '客户',
     inputType: 3,
-    rule:{
-      required: true, message: '客户不能为空', trigger: 'blur'
+    // rule:{
+    //   required: true, message: '客户不能为空', trigger: 'blur'
+    // }
+    rule(formData){
+      return {
+        required: true, message: '客户不能为空', trigger: 'blur'
+      }
     }
   },
   {
@@ -105,7 +110,7 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
   },
   {
-    key: 'restNumber',//!spjs2
+    key: 'number_2',//!spjs2
     label: '结存件数',
     fixed: false,
     width: '100px',
@@ -132,7 +137,8 @@ export const tableColumns = [
         { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字(最多2位小数)', trigger: 'blur' },
         {
           validator(rule, value, callback) {
-            if(value > formData.restNumber){
+            console.log('服气');
+            if(value > formData.number_2){
               callback(new Error('件数超过了剩余库存'))
             }
             callback()
@@ -176,7 +182,7 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
   },
   {
-    key: 'dischargeDate',
+    key: 'date_2',
     label: '出仓日期',
     fixed: false,
     inputType: 2,

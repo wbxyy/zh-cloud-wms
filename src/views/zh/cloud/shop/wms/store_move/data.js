@@ -3,8 +3,7 @@
 //todo 调入吨数 spsl <==> totalWeight
 //todo 创建日期 prrq <==> createDate
 //todo 制单人 rsopmc <==> creator
-import moment from "moment"
-import { getWarehouseOptions,getPositionsOptions } from "../store_in/data"
+import { positionsStoreInOptions,warehouseStoreInOptions } from "@api/wms/preFetch"
 export const formLabel = [
     {
       key: '$billNo',
@@ -24,7 +23,8 @@ export const formLabel = [
       startPlaceholder:"开始日期",
       endPlaceholder:"结束日期",
       rangeSeparator:"至",
-      valueFormat:"yyyy-MM-dd"
+      valueFormat:"yyyy-MM-dd",
+      splitParams:['startDate','endDate']
     },
     {
       key: '$skuNo',
@@ -41,11 +41,11 @@ export const formLabel = [
       label: '仓库',
       inputType:1,
       filterable:true,
-      options:getWarehouseOptions().then(data=>{
-        return data.map(m=>({
-          label:m.label,
-          value:m.label,
-          id:m.value
+      options:warehouseStoreInOptions().then(data=>{
+        return data.map(item=>({
+          label:item.label,
+          value:item.label,
+          id:item.value
         }))
       }),
     },
@@ -58,10 +58,10 @@ export const formLabel = [
         trigger:'warehouse',
         resolve:function(id){
           if(_.get(id,'id')){
-            return getPositionsOptions(id.id).then(data=>{
-              return data.map(m=>({
-                label:m.label,
-                value:m.label
+            return positionsStoreInOptions(id.id).then(data=>{
+              return data.map(item=>({
+                label:item.label,
+                value:item.label
               }))
             })
           }
@@ -121,9 +121,6 @@ export const tableColumns = [
     key: 'createDate',
     width: '120px',
     align: 'center',
-    filter(val){
-      return moment(val).format('YYYY-MM-DD')
-    }
   },
   {
     label: '创建人',//!rsopmc
@@ -154,5 +151,6 @@ export const tableColumns = [
     key: 'billRemark',
     width: '200px',
     align: 'center',
+    error:'新增调仓单不能传备注'
   },
 ]

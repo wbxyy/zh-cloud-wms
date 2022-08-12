@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="form" :model="formData" :rules="rules" :size="size" label-position="right" label-width="auto">
+  <el-form ref="form" :model="sugarData" :rules="rules" :size="size" label-position="right" label-width="auto" :validate-on-rule-change="false">
     <el-card v-for="(group,groupIndex) in fieldSet" :key="groupIndex" shadow="never" :class="{'little-margin-top':groupIndex!==0}">
       <div v-if="group" slot="header" class="clearfix">
         <span>{{group}}</span>
@@ -12,7 +12,7 @@
                 <template #label>
                   <span v-tooltip="item.message" v-tooltip:error="item.error" ref="label" id="sugar">{{item.label}}</span>
                 </template>
-                <SugarTypeIn :form-item="item" :value="formData" :method-obj="methodObj" ></SugarTypeIn>
+                <SugarTypeIn :form-item="item" :value="sugarData" :method-obj="methodObj" ></SugarTypeIn>
               </el-form-item>
             </el-col>
           </el-row>
@@ -31,7 +31,6 @@ export default {
   components:{
     SugarTypeIn
   },
-  props:['formLabel','formData',"formCol",'methodObj','size'],
   props:{
     formLabel:Array,
     formData:Object,
@@ -47,13 +46,36 @@ export default {
   },
   data(){
     return {
-      labelWidthBase:85,
-      labelWidthAsterisk:20,
-
+      sugarData:{}
     }
   },
-  mounted(){
-    console.log('sugarForm mounted');
+  created(){
+    const entries = this.formLabel.map(item=>([item.key,undefined]))
+
+    this.sugarData = {
+      ...Object.fromEntries(entries),
+      ...this.formData
+    }
+  },
+  watch:{
+    'sugarData':{
+      deep:true,
+      handler(data){
+        this.$emit('update:formData',data)
+      }
+    },
+    'formData':{
+      deep:true,
+      handler(data){
+        //!根据props传过来的对象，赋值给内部数据源sugarData
+        Object.keys(this.sugarData).forEach(key=>{
+          this.sugarData[key] = this.formData[key]
+        })
+        //!此处诚不可修改sugarData的引用，watch是懒监听，当引用及内部数据没有变化时，不会触发handler
+        //! 此处修改引用会导致内部watch空转
+        //!× this.sugarData = _.cloneDeep(this.formData)
+      }
+    }
   },
   computed:{
     filterLabel(){
@@ -73,8 +95,10 @@ export default {
       const entries = this.filterLabel.map(item=>{
         let rule = item.rule
         //! 支持函数形式的rule，传递整个表单值
+        //! created处修改了sugarData，进而诱发rules的重新计算，默认下el-form会立即执行一次校验
+        //! 设置validate-on-rule-change=false
         if(typeof item.rule === 'function'){
-          rule = item.rule(this.formData)
+          rule = item.rule({...this.sugarData})
         }
         return [item.key,rule]
       })

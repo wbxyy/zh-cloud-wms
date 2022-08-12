@@ -48,7 +48,7 @@ export default {
     data:{
       deep:true,
       handler(list){
-        if(!this.tableColumns) return
+        if(!Array.isArray(list)) return
         list.forEach(item=>{
           //!执行filter的位置
           for(const key in item){

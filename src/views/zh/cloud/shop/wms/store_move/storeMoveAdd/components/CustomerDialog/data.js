@@ -1,3 +1,6 @@
+//!调仓下拉不知道用哪个
+import { customerStoreOutOptions,warehouseStoreOutOptions } from '@api/wms/preFetch'
+
 export const tableColumns = [
   {
     key: 'customerName',
@@ -27,43 +30,29 @@ export const tableColumns = [
   },
 ]
 
-import {optionsCustomer,optionsWarehouse} from '@api/wms/store_out'
-const customerOptions = optionsCustomer().then(res=>{
-  const options = res.data.map(m=>({
-    label:m.customerName,
-    value:m.customerName
-  }))
-  return options
-})
-
-const warehouseOptions = optionsWarehouse().then(res=>{
-  console.log(res);
-  const options = res.data.map(m=>({
-    label:m.warehouse,
-    value:m.warehouse
-  }))
-  return options
-})
 export const formLabel = [
   {
     key:'customerName',
     label:'客户',
     inputType:1,
-    options:customerOptions,
+    options:customerStoreOutOptions().then(res=>{
+      return res
+    }),
     filterable:true,
+    error:'用的是出仓客户api'
   },
   {
     key:'warehouse',
     label:'仓库',
     inputType:1,
-    options:warehouseOptions.then(options=>{
-      return options.map(m=>({
-        label:m.label,
-        value:m.label
+    options:warehouseStoreOutOptions().then(options=>{
+      return options.map(item=>({
+        label:item.label,
+        value:item.label
       }))
     }),
     filterable:true,
-    error:'搜到0的数据，是数据本身是小于10e-4'
+    error:'搜到0的数据，是数据本身是小于10e-4，用的是出仓仓库api'
   },
   {
     key:'$shipNo',

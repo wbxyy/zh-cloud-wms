@@ -1,5 +1,12 @@
-import { getYarn,getTech,getPurpose,getProcess,getOrigin,getBleach,getPositionsOptions } from "../data"
-//formRules的结构如下
+import {
+  getYarn,
+  getTech,
+  getPurpose,
+  getProcess,
+  getOrigin,
+  getBleach,
+} from "@api/wms/preFetch"
+//rule的结构如下
 /**
  * {
  *  customerName:[
@@ -179,7 +186,7 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
     rule:[
       {required: true, message: '件数不能为空', trigger: 'blur'},
-      { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字', trigger: 'blur' }
+      { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字(最多2位小数)', trigger: 'blur' }
     ]
   },
   {

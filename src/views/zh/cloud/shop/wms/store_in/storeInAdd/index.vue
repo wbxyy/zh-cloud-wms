@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!-- 标题start -->
-    <el-card shadow="never">
+    <el-card shadow="never" class="mb10">
       <div class="card-title card-padding">
         <div class="card-info">
           <i class="el-icon-tickets" />
@@ -60,36 +60,35 @@
     <!-- 表单start -->
     <SugarForm
       ref="SugarForm"
-      class="little-margin-top"
+      class="mb10"
       :form-label="formLabel"
-      :form-data="formData"
+      :form-data.sync="formData"
       :form-col="formCol"
       :method-obj="methodObj"
     >
-      <div class="fr tinny-margin-bottom">
+      <div class="fr mb10">
         <el-button @click="handleReset">重置</el-button>
       </div>
     </SugarForm>
     <!-- 表单end -->
 
     <!-- 操作栏start -->
-    <div class="operation tinny-margin-top">
-      <el-button v-show="formData.warehouse" type="primary" @click="handleAddRow">新增</el-button>
+    <div class="operation mb10">
+      <el-button :disabled="!Boolean(formData.warehouse)" type="primary" @click="handleAddRow">新增</el-button>
     </div>
     <!-- 操作栏end -->
 
     <!-- 表格start -->
     <SugarEditTable
-      v-show="formData.warehouse"
       ref="SugarEditTable"
-      class="tinny-margin-top"
-      :table-data="list"
+      class="mb10"
+      :table-data.sync="list"
       :table-columns="tableColumns"
     />
     <!-- 表格end -->
 
     <!-- footer_start -->
-    <div class="footer little-margin-top">
+    <div class="footer">
 
       <el-button type="warning" @click="handleSubmit">提交入仓单</el-button>
     </div>
@@ -100,24 +99,30 @@
 
 <script>
 import { formLabel, tableColumns } from './data'
-import { customerList, warehouseList, storeInCreate, warehousePositions } from '@/api/zh/cloud/wms/store_in'
+import { storeInCreate } from '@/api/zh/cloud/wms/store_in'
+import { customerStoreIn, warehouseStoreIn, positionsStoreInOptions } from '@api/wms/preFetch'
 import SugarForm from '@/components/SugarForm'
 import SugarEditTable from '@/components/SugarEditTable'
-const formData = {
-  customerName: null, //! 客户名#
+// const formData = {
+//   customerName: null, //! 客户名#
+//   $customerId: null, //! 客户id
+//   warehouse: null, //! 仓库名
+//   $warehouseId: null, //! 仓库id
+//   $outerNo: null, //! 外部单号✔#
+//   plateNumber: null, //! 车牌✔#
+//   linkman: null, //! 联系人✔#
+//   phone: null, //! 电话✔#
+//   identity: null, //! 身份证✔#
+//   realSettlement: null, //! 实际结算方#
+//   billRemark: null, //! 单证备注✔#
+//   stevedorage: `1`, //! 装卸费(1代表inactive)✔#
+//   workingOut: `1`, //! 作业量(1代表inactive)✔#
+//   list: []//! 入仓条码明细
+// }
+
+const extra = {
   $customerId: null, //! 客户id
-  warehouse: null, //! 仓库名
-  $warehouseId: null, //! 仓库id
-  $outerNo: null, //! 外部单号✔#
-  plateNumber: null, //! 车牌✔#
-  linkman: null, //! 联系人✔#
-  phone: null, //! 电话✔#
-  identity: null, //! 身份证✔#
-  realSettlement: null, //! 实际结算方#
-  billRemark: null, //! 单证备注✔#
-  stevedorage: `1`, //! 装卸费(1代表inactive)✔#
-  workingOut: `1`, //! 作业量(1代表inactive)✔#
-  list: []//! 入仓条码明细
+  $warehouseId: null//! 仓库id
 }
 export default {
   name: 'StoreInAdd',
@@ -139,7 +144,7 @@ export default {
       loading: true,
       // 明细
       list: [],
-      formData: Object.assign({}, formData),
+      formData: { ...extra },
       formLabel: formLabel,
       tableColumns: tableColumns,
       warehouseList: [],
@@ -147,7 +152,6 @@ export default {
     }
   },
   computed: {
-
     // SugarForm方法映射
     methodObj() {
       return {
@@ -175,19 +179,17 @@ export default {
       this.list.forEach(item => {
         item.$positionId = null
       })
-      warehousePositions(warehouseId).then(res => {
-        const data = res.data
+      positionsStoreInOptions(warehouseId).then(res => {
         // 构造options
-
-        this.tableColumns.find(item => item.key === '$positionId').options = data.map(item => ({ label: item.position, value: item.$positionId }))
+        this.tableColumns.find(item => item.key === '$positionId').options = res
       })
     }
   },
   mounted() {
-    customerList().then(res => {
+    customerStoreIn().then(res => {
       this.customerList = res.rows
     })
-    warehouseList().then(res => {
+    warehouseStoreIn().then(res => {
       this.warehouseList = res.rows
     })
   },
@@ -205,15 +207,20 @@ export default {
     handleSubmit() {
       Promise.all([this.$refs.SugarForm.validate(), this.$refs.SugarEditTable.validate()]).then(values => {
         if (values.every(truly => truly)) {
-          this.formData.list = this.list
-          return storeInCreate(this.formData)
+          const data = { list: this.list, ...this.formData }
+          this.$modal.loading('提交新增中...')
+          return storeInCreate(data)
         }
       }).then(res => {
         if (!res) return this.$modal.alert('添加入仓单失败，联系....')
-        this.$modal.alert('添加入仓单成功')
+        this.$modal.confirm('添加成功').then(res => {
+          this.goBack()
+        })
         // ?清空表单
       }).catch(err => {
         console.error('坐标：提交入仓单', err)
+      }).finally(() => {
+        this.$modal.closeLoading()
       })
     },
     handleSelectCustomer(val) {
@@ -227,7 +234,15 @@ export default {
       this.formData.$warehouseId = val.id
     },
     handleReset() {
-      this.formData = Object.assign({}, formData)
+      this.$refs.SugarForm.resetFields()
+      // this.formData = Object.assign({}, formData)
+    },
+    goBack() {
+      this.$tab.closePage({ path: '/wms/store_in/add', name: 'StoreInAdd' }).then(res => {
+        this.$router.push({
+          path: '/wms/storeIn'
+        })
+      })
     }
   }
 }

@@ -1,5 +1,15 @@
 import _ from 'lodash'
-import { getWarehouseOptions,getPositionsOptions,getYarn,getTech,getPurpose,getProcess,getOrigin,getBleach } from '../data'
+import {
+  warehouseStoreInOptions,
+  positionsStoreInOptions,
+  getYarn,
+  getTech,
+  getPurpose,
+  getProcess,
+  getOrigin,
+  getBleach
+} from '@api/wms/preFetch'
+
 export const formLabel = [
   {
     key: '$billNo',
@@ -134,7 +144,7 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
   },
   {
-    key: '$newWarehouseId',
+    key: '$warehouseId_1',
     label: '仓库',
     align: 'left',
     fixed: false,
@@ -144,7 +154,7 @@ export const tableColumns = [
     // options:getWarehouseOptions(),
     options:{
       resolve(){
-        return getWarehouseOptions()
+        return warehouseStoreInOptions()
       }
     },
     renderGroup: '基本货物信息',
@@ -230,7 +240,7 @@ export const tableColumns = [
   },
 
   {
-    key: '$newPositionId',//!ckcw
+    key: '$positionId_1',//!ckcw
     label: '仓位',
     align: 'left',
     fixed: false,
@@ -241,7 +251,7 @@ export const tableColumns = [
       trigger:'$newWarehouseId',
       resolve(id){
         if(_.get(id,'value')){
-          return getPositionsOptions(id.value)
+          return positionsStoreInOptions(id.value)
         }
       }
     },
@@ -271,7 +281,7 @@ export const tableColumns = [
   },
    //!拆分件数
   {
-    key: 'splitNumber',//!spjs3
+    key: 'number_3',//!spjs3
     label: '拆分件数',
     align: 'left',
     fixed: false,
@@ -297,7 +307,7 @@ export const tableColumns = [
   },
   //!拆分入仓日期
   {
-    key: 'splitDate',//!ssrqid3
+    key: 'date_3',//!ssrqid3
     label: '拆分入仓日期',
     fixed: false,
     columnVisible:false,
@@ -305,7 +315,7 @@ export const tableColumns = [
     renderGroup: '拆单信息',
   },
   {
-    key: '$splitPositionId',
+    key: '$positionId_3',
     label: '新仓位',
     columnVisible:false,
     fixed: false,

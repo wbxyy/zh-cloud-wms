@@ -1,6 +1,4 @@
-import service from '@/utils/request'
-import { mapRequest, mapResponse, transformData, transformSelect, getSampleMapping } from '@/utils/sugar'
-import { getDicts } from '@/api/system/dict/data'
+import { request, getSchema } from '@api/wms/request'
 import {
   sampleStoreOutList,
   sampleStoreOutDelete,
@@ -10,55 +8,11 @@ import {
   sampleStoreOutCreate,
   sampleSelectStock,
   sampleAppendStock,
-  sampleCustomerList,
   sampleStoreOutAudit,
   sampleStoreOutReject,
   sampleStoreOutHistory,
-  sampleStoreOutOverview,
-  sampleOptionsCustomer,
-  sampleOptionsWarehouse
+  sampleStoreOutOverview
 } from './sample'
-
-const dict = getDicts('store_in_schema').then(res => res.data)
-
-function getSchema(pairSample) {
-  return {
-    request: dict.then(res => getSampleMapping(res, pairSample.request)),
-    response: dict.then(res => getSampleMapping(res, pairSample.response)),
-    sample: pairSample.request
-  }
-}
-
-// 构造新实例
-const request = service.extend(service.defaults)
-
-// 请求拦截器=》放在1号位
-request.interceptors.request.use(async config => {
-  // ? 允许重复提交
-  // config.headers.repeatSubmit = false
-
-  const schema = config.schema
-  if (schema) {
-    config.data = mapRequest(config.data, await schema.request)
-    config.data = transformData(config.data, schema.sample)
-  }
-  config.data = transformSelect(config.data)
-
-  return config
-})
-
-// 响应拦截器=》放在1号位
-request.interceptors.response.unshift(async res => {
-  const schema = res.config.schema
-  if (schema) {
-    res.data = mapResponse(res.data, await schema.response)
-  }
-  return res
-})
-
-/*
-* 入仓单的接口总览
-*/
 
 // ? 出仓单列表
 export function storeOutList({ data, params }) {
@@ -120,29 +74,6 @@ export function storeOutCreate(data) {
     method: 'post',
     data,
     schema: getSchema(sampleStoreOutCreate)
-  })
-}
-
-// ? 货物出仓->添加出仓单：获取客户列表 => 出仓单新增页
-export function customerList({ data, params } = {}) {
-  const _params = {
-    pageNum: 1,
-    pageSize: 100000
-  }
-  const _data = {
-    'isBa': '',
-    'khmc': '',
-    'khpb': 0,
-    'shopId': 0,
-    'spckid': '',
-    'spckidis': []
-  }
-  return request({
-    url: '/storage/hwcc/selectCustomer',
-    method: 'post',
-    data: Object.assign(_data, data),
-    params: Object.assign(_params, params),
-    schema: getSchema(sampleCustomerList)
   })
 }
 
@@ -241,20 +172,3 @@ export function storeOutOverview(data) {
 // ?通用搜索
 // todo 取样查找：qycz<==>sample
 // todo 精确查找：jqcz<==>accurate
-
-// 选择客户
-export function optionsCustomer() {
-  return request({
-    url: `/storage/shop/selectClient`,
-    method: 'post',
-    schema: getSchema(sampleOptionsCustomer)
-  })
-}
-// 选择仓库
-export function optionsWarehouse() {
-  return request({
-    url: `/storage/zdspck/selectWarehouse3`,
-    method: 'post',
-    schema: getSchema(sampleOptionsWarehouse)
-  })
-}

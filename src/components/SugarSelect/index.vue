@@ -30,8 +30,14 @@ export default {
     }
   },
   watch:{
-    'item.options'(val){
-      this.options = val
+    'item.options':{
+      async handler(val){
+        if(val instanceof Promise){
+          this.options = await val
+        }else{
+          this.options = val
+        }
+      }
     }
   },
   data(){

@@ -2,9 +2,11 @@
   <div>
     <h1>haha</h1>
      <SugarForm
-    :form-data='formData'
+    :form-data.sync='formData'
     :form-label="formLabel"
   ></SugarForm>
+  <button @click="showData">显示数据</button>
+  <button @click="update">修改formData</button>
   </div>
 
 </template>
@@ -16,16 +18,24 @@ export default {
   components:{
     SugarForm
   },
+  methods:{
+    showData(){
+      console.log(this.formData);
+    },
+    update(){
+      this.formData = {
+        a:1,
+        b:2,
+        c:3,
+        d:4,
+        e:5,
+        f:6
+      }
+    }
+  },
   data(){
     return {
-      formData:{
-        a:null,
-        b:null,
-        c:null,
-        d:null,
-        e:null,
-        f:null,
-      },
+      formData:{a:10,b:20},
       formLabel:[
         {
           key:'a',

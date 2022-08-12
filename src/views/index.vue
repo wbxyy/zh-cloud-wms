@@ -387,8 +387,6 @@
 
 <script>
 // 来首页玩一下mappingField
-import { categoryDropdown } from '@api/wms/category'
-
 export default {
   name: 'Index',
   data() {

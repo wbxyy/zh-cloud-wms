@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-card shadow="never">
+    <el-card shadow="never" class="mb10">
       <div class="card-title card-padding">
         <div class="card-info">
           <i class="el-icon-tickets" />
@@ -19,9 +19,9 @@
 
     <SugarForm
       ref="SugarForm"
-      class="little-margin-top filter-container"
+      class="mb10 filter-container"
       :form-label="formLabel"
-      :form-data="formData"
+      :form-data.sync="formData"
       :form-col="formCol"
     >
       <!-- <div class="fr filter-item">
@@ -30,36 +30,40 @@
     </SugarForm>
     <SugarEditTable
       ref="SugarEditTable"
-      :table-data="list"
+      class="mb10"
+      :table-data.sync="list"
       :table-columns="tableColumns"
-      :edit-mode="false"
       :allow-empty="true"
     />
 
-    <el-button type="primary" @click="handleSubmit">提交更新</el-button>
+    <div class="mb10">
+      <el-button type="primary" @click="handleSubmit">提交更新</el-button>
+      <el-button type="primary" @click="handleAudit">{{ row.$verifyNo === '0' ? '审核' : '驳回' }}</el-button>
+    </div>
 
-    <el-button type="primary" @click="handleAudit">{{ verify||'审核' }}</el-button>
   </div>
 </template>
 
 <script>
-import moment from 'moment'
+import { parallelPromise, sequentialPromise } from '@/utils/sugar'
+import _ from 'lodash'
 import { formLabel, tableColumns } from './data'
 import { storeOutUpdate, storeOutUpdateDetail, storeOut, storeOutAudit, storeOutReject, storeOutDelete } from '@api/wms/store_out'
 import SugarForm from '@/components/SugarForm'
 import SugarEditTable from '@/components/SugarEditTable'
-const formData = {
-  $billNo: null, // 单号
-  $billId: null, //! 单据id
-  plateNumber: null, //! 车牌
-  linkman: null, //! 联系人
-  phone: null, //! 电话
-  identity: null, //! 身份证
-  billRemark: null, //! 单证备注
-  stevedorage: null, //! 装卸费(1代表inactive)
-  workingOut: null, //! 作业量(1代表inactive)
-  $outerNo: null
-}
+// const formData = {
+//   $billNo: null, // 单号
+//   $billId: null, //! 单据id
+//   plateNumber: null, //! 车牌
+//   linkman: null, //! 联系人
+//   phone: null, //! 电话
+//   identity: null, //! 身份证
+//   billRemark: null, //! 单证备注
+//   stevedorage: null, //! 装卸费(1代表inactive)
+//   workingOut: null, //! 作业量(1代表inactive)
+//   $outerNo: null
+// }
+
 export default {
   name: 'StoreOutEdit',
   components: {
@@ -75,15 +79,10 @@ export default {
       // 明细
       list: [],
       rawList: [],
-      formData: Object.assign({}, formData),
+      formData: {},
       formLabel: formLabel,
       tableColumns: tableColumns,
-      verify: ''
-    }
-  },
-  computed: {
-    row() {
-      return this.$route.params.row
+      row: {}
     }
   },
   activated() {
@@ -93,18 +92,21 @@ export default {
     getData() {
       // 回显数据
       // 守卫
-      if (!this.row) return
+      if (!this.$route.params.row) return
+      this.row = this.$route.params.row
+      const { $billId } = this.row
 
-      this.verify = this.row.verify === '未审核' ? '审核' : '驳回'
       Object.keys(this.formData).forEach(key => {
         this.formData[key] = this.row[key]
       })
 
-      if (this.formData.$billId) {
-        storeOut(this.formData.$billId).then(res => {
-          this.list = res.data
-          // rowList用来保持原始数据，浅拷贝
-          this.rawList = this.list.slice()
+      if ($billId) {
+        storeOut($billId).then(res => {
+          this.$refs.SugarEditTable.init(res.data).then(res => {
+            // rowList用来保持原始数据，浅拷贝
+            this.rawList = this.list.slice()
+            return res
+          })
         })
       }
     },
@@ -113,11 +115,12 @@ export default {
         if (values.every(truly => truly)) {
           // 获取updateList和deleteList
           const promisesUpdate = []
+
           this.list.forEach(item => {
-            promisesUpdate.push(storeOutUpdateDetail(Object.assign({}, item, {
-              $billId: Number(this.formData.$billId),
+            promisesUpdate.push(_.partial(storeOutUpdateDetail, Object.assign({}, item, {
+              $billId: Number(this.row.$billId),
               // 修改时间
-              date: item.dischargeDate
+              date: item.date_2
             })))
           })
 
@@ -125,52 +128,74 @@ export default {
           const delList = this.rawList.filter(f => !this.list.find(i => i.$skuId === f.$skuId))
 
           delList.forEach(item => {
-            promisesDelete.push(storeOutDelete(Object.assign({}, item, {
-              $billId: Number(this.formData.$billId),
+            promisesDelete.push(_.partial(storeOutDelete, Object.assign({}, item, {
+              $billId: Number(this.row.$billId),
               createDate: this.row.createDate
             })))
           })
-          return Promise.all([storeOutUpdate(this.formData), ...promisesUpdate, ...promisesDelete])
+
+          this.$modal.loading('串行提交中...请稍后...')
+          return sequentialPromise([_.partial(storeOutUpdate, this.formData), ...promisesUpdate, ...promisesDelete]).finally(res => {
+            return res
+          })
         }
       }).then(res => {
         if (!res) return this.$modal.alert('修改出仓单失败，联系....')
-        this.$modal.alert('修改出仓单成功')
+        this.$modal.confirm('修改成功').then(res => {
+          this.goBack()
+        })
         // ?清空表单
       }).catch(err => {
         console.error('坐标：修改出仓单', err)
+      }).finally(() => {
+        this.$modal.closeLoading()
       })
     },
     handleReset() {
-      this.formData = Object.assign({}, formData)
+      this.$refs.SugarForm.resetFields()
+    },
+    goBack() {
+      this.$tab.closePage({ path: '/wms/store_out/edit', name: 'StoreOutEdit' }).then(res => {
+        this.$router.push({
+          path: '/wms/storeOut'
+        })
+      })
     },
     handleAudit() {
       const data = [this.row]
-      if (this.verify === '审核') {
+      const { $verifyNo } = this.row
+      if ($verifyNo === '0') {
+        this.$modal.loading('提交审核中...')
         storeOutAudit(data).then(res => {
           this.$modal.msgSuccess('审核成功')
-          this.verify = '驳回'
-          this.$router.replace({
-            name: 'StoreOut',
-            params: {
+          this.$router.push({
+            path: '/wms/storeOut',
+            query: {
               refresh: true
             }
           })
         }).catch(err => {
           this.$modal.msgError('审核失败', err)
+        }).finally(res => {
+          this.$modal.closeLoading()
+          return res
         })
       } else {
         const id = this.row.$billId
+        this.$modal.loading('提交驳回中...')
         storeOutReject(id).then(res => {
           this.$modal.msgSuccess('驳回成功')
-          this.verify = '审核'
-          this.$router.replace({
-            name: 'StoreOut',
-            params: {
+          this.$router.push({
+            path: '/wms/storeOut',
+            query: {
               refresh: true
             }
           })
         }).catch(err => {
           this.$modal.msgError('驳回失败', err)
+        }).finally(res => {
+          this.$modal.closeLoading()
+          return res
         })
       }
     }

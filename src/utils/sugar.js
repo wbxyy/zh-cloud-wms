@@ -1,6 +1,6 @@
 
-import {sampleStoreIn} from '@/api/zh/cloud/wms/store_in/sample'
 import _ from 'lodash'
+
 
 //? 转换函数，将组件formData和接口的sample融合，组合出带有幽灵属性的formData
 //? 幽灵属性是指没有实际用处，但是必须传入的属性，通常为项目迭代时，数据库写好，后来废弃的属性。
@@ -19,6 +19,7 @@ export function transformData(src,sample) {
 
     // 如果遇到对象，将 sample 的同级对象作为火锅底料
     if(!Array.isArray(src)){
+      //!这里有个不细的地方，无论请求数据有没有数组属性，都会把sample的示例数组给拉过来
       Object.assign(dst,sample)
     }
 
@@ -91,6 +92,12 @@ export function deepCopy(src){
   return dst
 }
 
+/**
+ * @deprecated
+ * @param {*} src
+ * @param {*} map
+ * @returns
+ */
 function handler(src,map){
   let dst = src
   //将map的键值里的值，作为新数据的键
@@ -116,8 +123,10 @@ function handler(src,map){
   return dst
 }
 
+
 /**
  * 此方法会修改原对象
+ * @deprecated
  * @param {*} data 响应体
  * @param {*} mapping 接口字段映射
  * @returns
@@ -136,13 +145,14 @@ export function mapResponse(data,mapping){
 
 /**
  * 此方法会修改原对象
+ * @deprecated
  * @param {*} data 请求体
  * @param {*} mapping 接口字段映射
  * @returns
  */
+//? 起初是传入data和一维度mapping，进行字段的映射
+//? 目前要实现多层次mapping，应该传入data和sample
 export function mapRequest(data,mapping){
-  console.log(data);
-  console.log(mapping);
   const result = handler(data,mapping)
   return result
 }
@@ -182,7 +192,7 @@ export function getSampleField(sample){
 }
 
 /**
- *
+ * @deprecated
  * @param {*} dict 字典
  * @param {*} sample swagger接口的请求示例sample
  * @returns 接口字段映射
@@ -264,4 +274,25 @@ export function getActualWidthOfChar(text,options = {}){
   ctx.font = `${fontSize}px ${fontFamily}`
   const metrics = ctx.measureText(text);
   return Math.abs(metrics.actualBoundingBoxLeft) + Math.abs(metrics.actualBoundingBoxRight)
+}
+
+
+//并行提交方法
+export function parallelPromise(methods){
+  const promises = []
+  methods.forEach(item=>{
+    promises.push(item())
+  })
+  return Promise.all(promises)
+}
+
+//串行提交方法
+export function sequentialPromise(methods){
+  let p = Promise.resolve()
+  methods.forEach(item=>{
+    p = p.then(()=>{
+      return item()
+    })
+  })
+  return p
 }

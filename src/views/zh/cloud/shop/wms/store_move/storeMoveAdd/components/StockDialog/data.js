@@ -15,7 +15,6 @@
 //spjsz<==>pledgeNumber(质押件数)
 //spslz<==>pledgeWeight(质押吨数)
 
-import moment from "moment"
 
 export const tableColumns = [
   {
@@ -45,7 +44,7 @@ export const tableColumns = [
     width:'280px',
   },
   {
-    key: 'restNumber',
+    key: 'number_2',
     label: '件数',
     filter(val){
       return Math.round(Number(val||0)*100)/100
@@ -60,7 +59,7 @@ export const tableColumns = [
     }
   },
   {
-    key: 'dischargeDate',//!ssrqidn
+    key: 'date_n',//!ssrqidn
     label: '入仓日期',
     width:'100px',
   },
@@ -119,9 +118,6 @@ export const tableColumns = [
     key: 'manufactureDate',//!wpggG
     label: '生产日期',
     width:'100px',
-    filter(val){
-        return val && moment(val).format('YYYY-MM-DD')
-    }
   },
   {
     key: 'color',//!wpggH

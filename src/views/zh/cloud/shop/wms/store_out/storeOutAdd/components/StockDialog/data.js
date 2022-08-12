@@ -40,7 +40,7 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
   },
   {
-    key: 'restNumber',
+    key: 'number_2',
     label: '剩余件数',
     align: 'left',
     fixed: false,

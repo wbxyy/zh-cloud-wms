@@ -88,6 +88,91 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/test',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   children: [
+  //     {
+  //       path: 'mainTableView',
+  //       component: () => import('@/test/testMainTableView'),
+  //       name: 'testMainTableView',
+  //       meta: { title: '测试接口', icon: 'user' }
+  //     },
+  //     {
+  //       path: 'sugarForm',
+  //       component: () => import('@/test/testSugarForm'),
+  //       name: 'testMainTableView',
+  //       meta: { title: '测试表单', icon: 'user' }
+  //     },
+  //     {
+  //       path: 'test',
+  //       component: () => import('@/test/test'),
+  //       name: 'test',
+  //       meta: { title: '测试响应式', icon: 'user' }
+  //     },
+  //     {
+  //       path: 'sugarEditTable',
+  //       component: () => import('@/test/testSugarEditTable'),
+  //       name: 'testSugarEditTable',
+  //       meta: { title: '测试编辑表格', icon: 'user' }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/wms/store_in',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@view/wms/store_in/index'),
+  //       name: 'StoreIn',
+  //       meta: { title: '货物入仓', activeMenu: '/wms/store_in/index' }
+  //     },
+  //     {
+  //       path: 'test',
+  //       component: () => import('@view/wms/store_in/test'),
+  //       name: 'storeInTest',
+  //       meta: { title: '货物入仓测试', activeMenu: '/wms/store_in/test' }
+  //     },
+  //     {
+  //       path: 'add',
+  //       name: 'StoreInAdd',
+  //       component: () => import('@view/wms/store_in/storeInAdd/index'),
+  //       meta: { title: '添加入仓',activeMenu:'/wms/store_in/StoreInAdd/index' }
+  //     },
+  //     {
+  //       path: 'edit',
+  //       name: 'StoreInEdit',
+  //       component: () => import('@view/wms/store_in/storeInEdit/index'),
+  //       meta: { title: '编辑入仓',activeMenu:'/wms/store_in/StoreInEdit/index' }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/wms/store_out',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@view/wms/store_out/index'),
+  //       name: 'StoreOut',
+  //       meta: { title: '货物出仓', activeMenu: '/wms/store_out/index' }
+  //     },
+  //     {
+  //       path: 'add',
+  //       name: 'StoreOutAdd',
+  //       component: () => import('@view/wms/store_out/storeOutAdd/index'),
+  //       meta: { title: '添加出仓',activeMenu:'/wms/store_out/StoreOutAdd/index' }
+  //     },
+  //     {
+  //       path: 'edit',
+  //       name: 'StoreOutEdit',
+  //       component: () => import('@view/wms/store_out/storeOutEdit/index'),
+  //       meta: { title: '编辑出仓',activeMenu:'/wms/store_out/StoreOutEdit/index' }
+  //     },
+  //   ]
+  // },
 
 
   //? 分析比写代码更重要
@@ -166,62 +251,7 @@ export const dynamicRoutes = [
       }
     ]
   },
-  // {
-  //   path: '/wms/store_in',
-  //   component: Layout,
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@view/wms/store_in/index'),
-  //       name: 'StoreIn',
-  //       meta: { title: '货物入仓', activeMenu: '/wms/store_in/index' }
-  //     },
-  //     {
-  //       path: 'test',
-  //       component: () => import('@view/wms/store_in/test'),
-  //       name: 'storeInTest',
-  //       meta: { title: '货物入仓测试', activeMenu: '/wms/store_in/test' }
-  //     },
-  //     {
-  //       path: 'add',
-  //       name: 'StoreInAdd',
-  //       component: () => import('@view/wms/store_in/storeInAdd/index'),
-  //       meta: { title: '添加入仓',activeMenu:'/wms/store_in/StoreInAdd/index' }
-  //     },
-  //     {
-  //       path: 'edit',
-  //       name: 'StoreInEdit',
-  //       component: () => import('@view/wms/store_in/storeInEdit/index'),
-  //       meta: { title: '编辑入仓',activeMenu:'/wms/store_in/StoreInEdit/index' }
-  //     },
-  //   ]
-  // },
-  // {
-  //   path: '/wms/store_out',
-  //   component: Layout,
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@view/wms/store_out/index'),
-  //       name: 'StoreOut',
-  //       meta: { title: '货物出仓', activeMenu: '/wms/store_out/index' }
-  //     },
-  //     {
-  //       path: 'add',
-  //       name: 'StoreOutAdd',
-  //       component: () => import('@view/wms/store_out/storeOutAdd/index'),
-  //       meta: { title: '添加出仓',activeMenu:'/wms/store_out/StoreOutAdd/index' }
-  //     },
-  //     {
-  //       path: 'edit',
-  //       name: 'StoreOutEdit',
-  //       component: () => import('@view/wms/store_out/storeOutEdit/index'),
-  //       meta: { title: '编辑出仓',activeMenu:'/wms/store_out/StoreOutEdit/index' }
-  //     },
-  //   ]
-  // },
+
 
 ]
 

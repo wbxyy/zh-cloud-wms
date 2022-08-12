@@ -1,6 +1,9 @@
 <template>
   <div class="top-right-btn">
     <el-row>
+      <el-tooltip v-show="showExport" class="item" effect="dark" :content="'导出'" placement="top">
+        <el-button size="mini" circle icon="el-icon-download" @click="handleExport()" />
+      </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
         <el-button size="mini" circle icon="el-icon-search" @click="toggleSearch()" />
       </el-tooltip>
@@ -48,15 +51,24 @@ export default {
     // 初始化transform目标列表(右边列表)
     if(!this.columns) return
     this.columns.forEach((item)=>{
-      if(item.columnVisible===false){
+      if(item.visible===false){
         this.value.push(item.key)
       }
     })
+  },
+  computed:{
+    showExport(){
+      return Boolean(this.$listeners.handleExport)
+    }
   },
   methods: {
     // 搜索
     toggleSearch() {
       this.$emit("update:showSearch", !this.showSearch);
+    },
+    //导出
+    handleExport(){
+      this.$emit("handleExport")
     },
     // 刷新
     refresh() {
@@ -64,12 +76,13 @@ export default {
     },
     // 右侧列表元素变化(data是右侧列表)
     dataChange(data) {
+      console.log(data);
       this.columns.forEach(item=>{
-        const isShow = !data.includes(item.key)
+        const showIt = !data.includes(item.key)
         if(item.hasOwnProperty('visible')){
-          item.visible = isShow
+          item.visible = showIt
         }else{
-          this.$set(item,'visible',isShow)
+          this.$set(item,'visible',showIt)
         }
       })
     },

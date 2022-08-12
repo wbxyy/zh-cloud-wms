@@ -68,7 +68,7 @@ export const tableColumns = [
     renderGroup: '概要',
   },
   {
-    key: 'dischargeDate',
+    key: 'date_n',
     label: '出仓日期',
     columnOrder:1040,
     inputType: 2,
@@ -79,13 +79,10 @@ export const tableColumns = [
     },
   },
   {
-    key: 'restNumber',
+    key: 'number_sum',
     label: '剩余件数',
     columnOrder:1030,
     renderGroup: '出仓信息',
-    rule:{
-      required: true, message: '出仓日期不能为空', trigger: 'change'
-    },
     unit:'件',
     filter(val){
       return Math.round(Number(val||0)*100)/100
@@ -108,7 +105,7 @@ export const tableColumns = [
         { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字(最多2位小数)', trigger: 'blur' },
         {
           validator(rule, value, callback) {
-            if(value > formData.restNumber){
+            if(value > formData.number_sum){
               callback(new Error('件数超过了剩余库存'))
             }
             callback()
@@ -197,7 +194,7 @@ export const tableColumns = [
     renderGroup: '概要',
   },
   {
-    key: '$skuId',
+    key: '$skuNo',
     label: '客户条码',
     align: 'left',
     width:'100px',

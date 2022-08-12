@@ -1,61 +1,9 @@
-import moment from 'moment'
+
 import _ from 'lodash'
-import { warehouseList,warehousePositions } from '@api/wms/store_in'
-let warehouse = warehouseList()
-export function getWarehouseOptions(){
-  return warehouse.then(res=>{
-    return res.rows.map(item=>({
-      label:item.warehouse,
-      value:item.$warehouseId
-    }))
-  })
-}
-
-
-export function getPositionsOptions(id){
-  return warehousePositions(id).then(res => {
-    return res.data.map(item=>({
-      label: item.position,
-      value: item.$positionId
-    }))
-  })
-}
-
-
-import { categoryDropdown } from '@api/wms/category'
-let dropdown = categoryDropdown()
-
-
-export function getYarn(){
-  return dropdown.then(res=>{
-    return res.data['a'].map(item=>({label:item.Name,value:item.Name}))
-  })
-}
-export function getTech(){
-  return dropdown.then(res=>{
-    return res.data['b'].map(item=>({label:item.Name,value:item.Name}))
-  })
-}
-export function getProcess(){
-  return dropdown.then(res=>{
-    return res.data['c'].map(item=>({label:item.Name,value:item.Name}))
-  })
-}
-export function getPurpose(){
-  return dropdown.then(res=>{
-    return res.data['d'].map(item=>({label:item.Name,value:item.Name}))
-  })
-}
-export function getOrigin(){
-  return dropdown.then(res=>{
-    return res.data['e'].map(item=>({label:item.Name,value:item.Name}))
-  })
-}
-export function getBleach(){
-  return dropdown.then(res=>{
-    return res.data['f'].map(item=>({label:item.Name,value:item.Name}))
-  })
-}
+import {
+  warehouseStoreInOptions,
+  positionsStoreInOptions,
+} from '@api/wms/preFetch'
 
 export const formLabel = [
   {
@@ -86,7 +34,8 @@ export const formLabel = [
     startPlaceholder:"开始日期",
     endPlaceholder:"结束日期",
     rangeSeparator:"至",
-    valueFormat:"yyyy-MM-dd"
+    valueFormat:"yyyy-MM-dd",
+    splitParams:['startDate','endDate']
   },
   {
     key: '$skuNo',
@@ -104,7 +53,7 @@ export const formLabel = [
     inputType:1,
     options:{
       trigger:'immediately',
-      resolve:getWarehouseOptions
+      resolve:warehouseStoreInOptions
     }
   },
   {
@@ -115,7 +64,7 @@ export const formLabel = [
       trigger:'$warehouseId',
       resolve:function(id){
         if(_.get(id,'value')){
-          return getPositionsOptions(id.value)
+          return positionsStoreInOptions(id.value)
         }
       }
     }
@@ -207,9 +156,6 @@ export const tableColumns = [
     visible: true,
     width: '120px',
     align: 'center',
-    filter(val){
-      return moment(val).format('YYYY-MM-DD')
-    }
   },
   {
     label: '审核日期',//!SHrqid

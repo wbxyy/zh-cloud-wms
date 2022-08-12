@@ -7,28 +7,10 @@ export const formLabel = [
   {
     key:'customerName',
     label:'客户',
-    inputType:3,
   },
   {
     key:'warehouse',
     label:'仓库',
-  },
-  {
-    key:'position',
-    label:'仓位',
-    inputType:3,
-    disabled(formData){
-      return !Boolean(formData.customerName)
-    }
-  },
-  {
-    key:'stock',
-    label:'库存',
-    inputType:3,
-    disabled(formData){
-      return !Boolean(formData.position)
-    },
-    error:'无法传客户名和客户id到接口'
   },
   {
     key:'movingType',
@@ -37,11 +19,11 @@ export const formLabel = [
     options:[
       {
         label:'客户调仓',
-        value:'客户调仓',
+        value:'ck_spdj16',
       },
       {
         label:'内部调仓',
-        value:'内部调仓',
+        value:'ck_spdj15',
       },
     ]
   },
@@ -51,6 +33,7 @@ export const formLabel = [
     inputType:0
   }
 ]
+
 
 export const tableColumns = [
   {
@@ -87,7 +70,7 @@ export const tableColumns = [
     label: '原仓库',
     align: 'left',
     fixed: false,
-    width: '80px',
+    width: '100px',
     renderGroup: '基本货物信息',
   },
   {
@@ -99,12 +82,28 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
   },
   {
-    key: '$newPositionId',
-    label: '选择新仓位',
+    key: '$positionId_2',
+    label: '新仓位',
     align: 'left',
     fixed: false,
-    width: '60px',
+    width: '120px',
+    inputType:1,
+    options:[],
+    //!注意：以选择条目来填充的editTable不能使用trigger，否则每选择一行就会请求一次仓位接口
+    // options:{
+    //   trigger:'$warehouseId',
+    //   resolve(id){
+    //     if(id){
+    //       return positionsStoreInOptions(id)
+    //     }
+    //   }
+    // },
     renderGroup: '基本货物信息',
+    rule:{
+      required:true,
+      message:'新仓位不能为空',
+      trigger:'blur'
+    }
   },
   {
     key: 'number',
@@ -112,15 +111,30 @@ export const tableColumns = [
     align: 'left',
     fixed: false,
     inputType:0,
-    width: '60px',
+    width: '100px',
     renderGroup: '基本货物信息',
+    error:'可以转任意件',
+    rule(formData){
+      return [
+        {required: true, message: '转移件数不能为空', trigger: 'blur'},
+        { pattern:/(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)/, message: '件数必须为数字(最多2位小数)', trigger: 'blur' },
+        {validator(rule,value,callback){
+          if(value <= 0 ) callback(new Error('转移件数不能为空'))
+          if(value > formData.number_2) callback(new Error('转移件数超出了库存'))
+            callback()
+        }}
+      ]
+    },
   },
   {
-    key: 'restNumber',
+    key: 'number_2',
     label: '原库存件数',
     align: 'left',
     fixed: false,
-    width: '60px',
+    width: '100px',
+    filter(val){
+      return Math.round(Number(val||0)*100)/100
+    },
     renderGroup: '基本货物信息',
   },
   {
@@ -128,7 +142,7 @@ export const tableColumns = [
     label: '单重',
     align: 'left',
     fixed: false,
-    width: '100px',
+    width: '60px',
     unit:'kg',
     renderGroup: '基本货物信息',
     filter(val){
@@ -150,10 +164,10 @@ export const tableColumns = [
     renderGroup: '基本货物信息',
   },
   {
-    key: 'dischargeDate',//!ssrqidn在出仓单是出仓日期，但是在调仓单是入仓日期
+    key: 'date_2',//!ssrqidn在出仓单是出仓日期，但是在调仓单是入仓日期
     label: '入仓日期',
     fixed: false,
-    width: '120px',
+    width: '100px',
     valueFormat:'yyyy-MM-dd',
     renderGroup: '基本货物信息',
   },
@@ -164,7 +178,7 @@ export const tableColumns = [
     inputType: 2,
     valueFormat:'yyyy-MM-dd',
     renderGroup: '基本货物信息',
-    width: '120px',
+    width: '100px',
     rule:{
       required: true, message: '出仓日期不能为空', trigger: 'change'
     },
@@ -174,7 +188,7 @@ export const tableColumns = [
     label: '天数',
     align: 'left',
     fixed: false,
-    width: '80px',
+    width: '60px',
     renderGroup: '基本货物信息',
   },
   {

@@ -1,3 +1,7 @@
+
+import { customerStoreOutOptions, warehouseStoreOutOptions } from '@api/wms/preFetch'
+
+
 export const tableColumns = [
   {
     key: 'customerName',
@@ -64,30 +68,12 @@ export const tableColumns = [
   },
 ]
 
-import {optionsCustomer,optionsWarehouse} from '@api/wms/store_out'
-const customerOptions = optionsCustomer().then(res=>{
-  const options = res.data.map(m=>({
-    label:m.customerName,
-    value:m.customerName
-  }))
-  return options
-})
-
-const warehouseOptions = optionsWarehouse().then(res=>{
-  console.log(res);
-  const options = res.data.map(m=>({
-    label:m.warehouse,
-    value:m.$warehouseId
-  }))
-  console.log(options);
-  return options
-})
 export const formLabel = [
   {
     key:'customerName',
     label:'客户',
     inputType:1,
-    options:customerOptions,
+    options:customerStoreOutOptions,
     filterable:true,
     // error:'客户没货时sql错误，佛山东源纺贸有限公司'
   },
@@ -95,7 +81,7 @@ export const formLabel = [
     key:'$warehouseId',
     label:'仓库',
     inputType:1,
-    options:warehouseOptions,
+    options:warehouseStoreOutOptions,
     filterable:true,
     // error:'仓库没有货时sql错误，禅城罗格仓'
   }

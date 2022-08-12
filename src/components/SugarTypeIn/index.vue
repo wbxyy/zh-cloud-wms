@@ -101,9 +101,9 @@ export default {
     bindClass(){
       let bindClass = ''
       switch(this.formItem.inputType){
-        case 0: bindClass='param-input';break;
-        case 1: bindClass='param-input';break;
-        case 2: bindClass='param-input';break;
+        case 0: bindClass=this.shortHolder? 'table-input':'param-input';break;
+        case 1: bindClass=this.shortHolder? 'table-input':'param-input';break;
+        case 2: bindClass=this.shortHolder? 'table-input':'param-input';break;
         case 3: bindClass='param-btn';break;
         case 4: bindClass='';break;
         default: bindClass='';break;
